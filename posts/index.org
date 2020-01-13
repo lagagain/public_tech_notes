@@ -1,6 +1,9 @@
+#+export_file_name: ../docs/index
+
+
 簡單的技術筆記
 
 * index
 
-- [[./關於Erlang裡的Processes.org][]]
+- [[./關於Erlang裡的Processes.org]]
 - [[./OMG_js.org][OMG Javascript]]
