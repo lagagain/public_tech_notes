@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW" xml:lang="zh-TW">
+<head>
+<!-- 2020-01-14 二 11:56 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OMG JavaScript</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="lagagain" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">OMG JavaScript</h1>
+
+<div id="outline-container-org7a0388e" class="outline-2">
+<h2 id="org7a0388e"><span class="section-number-2">1</span> 前言</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+稍微看了一下<a href="https://download.microsoft.com/download/C/6/0/C60E2BD0-8A7C-479F-851E-8B5810C0D70F/20130504_MVP_Track3_Session6.pdf">TypeScript 開發實戰</a>、<a href="https://download.microsoft.com/download/7/8/D/78D289B4-CC63-4EA8-BB40-0C957C64F013/20160510_InnovativeApplicationsDevelopmentConference_session7.pdf">使用 TypeScript 駕馭</a>。我以為我js算熟&#x2026;還是有東西和我想得不同&#x2026;簡單嘗試了一下裡頭的範例。
+</p>
+
+<p>
+測試的node.js版本：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">node --version
+</pre>
+</div>
+
+<pre class="example">
+v12.13.0
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org53e4261" class="outline-2">
+<h2 id="org53e4261"><span class="section-number-2">2</span> 各個範例嘗試</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orga5e2d80" class="outline-3">
+<h3 id="orga5e2d80"><span class="section-number-3">2.1</span> 'string' 和 String不同</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-js" id="org48e07c1"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">o1</span> = <span style="color: #70c0b1;">'Hello World'</span>;
+<span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">o2</span> = <span style="color: #b9ca4a;">new</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">'Hello World'</span><span style="color: #eaeaea;">)</span>;
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1 == o2: "</span>, o1 == o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">true</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1 === o2: "</span>, o1 === o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">false</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"typeof o1: "</span>, <span style="color: #b9ca4a;">typeof</span> o1<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">'string'</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"typeof o2: "</span>, <span style="color: #b9ca4a;">typeof</span> o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">'object</span>
+</pre>
+</div>
+
+<pre class="example">
+o1 == o2:  true
+o1 === o2:  false
+typeof o1:  string
+typeof o2:  object
+</pre>
+
+
+<p>
+原來 <code>new String()</code> 和原生 <code>string</code> 出來的不是同個類別&#x2026;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js" id="org7db6242"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">o1</span> = <span style="color: #70c0b1;">'Hello World'</span>;
+<span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">o2</span> = <span style="color: #b9ca4a;">new</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">'Hello World'</span><span style="color: #eaeaea;">)</span>;
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o2 instanceof String: "</span>, o2 <span style="color: #b9ca4a;">instanceof</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">true</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1 instanceof String: "</span>, o1 <span style="color: #b9ca4a;">instanceof</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">false</span>
+
+<span style="color: #b9ca4a;">try</span><span style="color: #eaeaea;">{</span>
+  o1 <span style="color: #b9ca4a;">instanceof</span> <span style="color: #7aa6da;">string</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">Erro, not define string</span>
+<span style="color: #eaeaea;">}</span><span style="color: #b9ca4a;">catch</span> <span style="color: #eaeaea;">(</span>e<span style="color: #eaeaea;">){</span>
+  console.debug<span style="color: #70c0b1;">(</span>e<span style="color: #70c0b1;">)</span>
+<span style="color: #eaeaea;">}</span>
+</pre>
+</div>
+
+<pre class="example">
+o2 instanceof String:  true
+o1 instanceof String:  false
+ReferenceError: string is not defined
+    at Object.&lt;anonymous&gt; (/tmp/babel-18852wT2/js-script-18852pye:7:17)
+    at Module._compile (internal/modules/cjs/loader.js:956:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:973:10)
+    at Module.load (internal/modules/cjs/loader.js:812:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:724:14)
+    at Function.Module.runMain (internal/modules/cjs/loader.js:1025:10)
+    at internal/main/run_main_module.js:17:11
+</pre>
+</div>
+
+
+<div id="outline-container-org0046a64" class="outline-4">
+<h4 id="org0046a64"><span class="section-number-4">2.1.1</span> 但是'string'會受到String.prototype影響&#x2026;</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+<code>'string'</code> 不能增加屬性或方法
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js" id="org8035969"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">car</span> = <span style="color: #70c0b1;">'Hello World'</span>;
+car.name = <span style="color: #70c0b1;">"BMW"</span>;
+car.start = <span style="color: #b9ca4a;">function</span><span style="color: #eaeaea;">()</span> <span style="color: #eaeaea;">{</span>
+    <span style="color: #b9ca4a;">return</span> <span style="color: #7aa6da;">true</span>;
+<span style="color: #eaeaea;">}</span>
+
+<span style="color: #b9ca4a;">try</span><span style="color: #eaeaea;">{</span>
+  car.start<span style="color: #70c0b1;">()</span>;
+<span style="color: #eaeaea;">}</span><span style="color: #b9ca4a;">catch</span><span style="color: #eaeaea;">(</span>e<span style="color: #eaeaea;">){</span>
+  console.debug<span style="color: #70c0b1;">(</span>e<span style="color: #70c0b1;">)</span>;
+<span style="color: #eaeaea;">}</span>
+<span style="color: #969896; font-style: italic;">/*</span>
+<span style="color: #969896; font-style: italic;">Thrown:</span>
+<span style="color: #969896; font-style: italic;">TypeError: car.start is not a function</span>
+<span style="color: #969896; font-style: italic;">*/</span>
+
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"car: "</span>, car<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">'Hello World'</span>
+</pre>
+</div>
+
+<pre class="example">
+TypeError: car.start is not a function
+    at Object.&lt;anonymous&gt; (/tmp/babel-18852wT2/js-script-18852CbA:8:7)
+    at Module._compile (internal/modules/cjs/loader.js:956:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:973:10)
+    at Module.load (internal/modules/cjs/loader.js:812:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:724:14)
+    at Function.Module.runMain (internal/modules/cjs/loader.js:1025:10)
+    at internal/main/run_main_module.js:17:11
+car:  Hello World
+</pre>
+
+
+<p>
+但是 <code>String</code> 產生的物件可以&#x2026;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js" id="org52dba81"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">car</span> = <span style="color: #b9ca4a;">new</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">'Hello World'</span><span style="color: #eaeaea;">)</span>;
+car.name = <span style="color: #70c0b1;">"BMW"</span>;
+car.start = <span style="color: #b9ca4a;">function</span><span style="color: #eaeaea;">()</span> <span style="color: #eaeaea;">{</span>
+<span style="color: #b9ca4a;">return</span> <span style="color: #7aa6da;">true</span>;
+<span style="color: #eaeaea;">}</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"car.start(): "</span>, car.start<span style="color: #70c0b1;">()</span><span style="color: #eaeaea;">)</span>; <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">true</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"car: "</span>, car<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">[String: 'Hello Wrold'] { name: 'BMW', start: [Function] }</span>
+</pre>
+</div>
+
+<pre class="example">
+car.start():  true
+car:  [String: 'Hello World'] { name: 'BMW', start: [Function] }
+</pre>
+
+
+<p>
+兩個都會受到 <code>String.prototype</code> 的影響Orz&#x2026;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js" id="org5a191d4"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">car</span> = <span style="color: #70c0b1;">'Hello World'</span>;
+String.<span style="color: #7aa6da;">prototype</span>.name = <span style="color: #70c0b1;">"BMW"</span>;
+String.<span style="color: #7aa6da;">prototype</span>.start = <span style="color: #b9ca4a;">function</span><span style="color: #eaeaea;">()</span>
+<span style="color: #eaeaea;">{</span>
+  <span style="color: #b9ca4a;">return</span> <span style="color: #7aa6da;">true</span>;
+<span style="color: #eaeaea;">}</span>
+<span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">txt</span> = <span style="color: #70c0b1;">'Will'</span>;
+
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"txt.name: "</span>, txt.name<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">"BMW"</span>
+</pre>
+</div>
+
+<pre class="example">
+txt.name:  BMW
+</pre>
+
+
+<hr />
+
+<div class="org-src-container">
+<pre class="src src-js" id="orgc7a74ee"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">car</span> = <span style="color: #b9ca4a;">new</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">'Hello World'</span><span style="color: #eaeaea;">)</span>;
+String.<span style="color: #7aa6da;">prototype</span>.name = <span style="color: #70c0b1;">"BMW"</span>;
+String.<span style="color: #7aa6da;">prototype</span>.start = <span style="color: #b9ca4a;">function</span><span style="color: #eaeaea;">()</span>
+<span style="color: #eaeaea;">{</span>
+  <span style="color: #b9ca4a;">return</span> <span style="color: #7aa6da;">true</span>;
+<span style="color: #eaeaea;">}</span>
+<span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">txt</span> = <span style="color: #70c0b1;">'Will'</span>;
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"txt.name: "</span>, txt.name<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">"BMW"</span>
+</pre>
+</div>
+
+<pre class="example">
+txt.name:  BMW
+</pre>
+
+
+<p>
+因為他們的 <code>prototype</code> 指向同一個物件&#x2026;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js" id="org47d2a25">o1 = <span style="color: #b9ca4a;">new</span> <span style="color: #7aa6da;">String</span><span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"Hello, World"</span><span style="color: #eaeaea;">)</span>
+o2 = <span style="color: #70c0b1;">"Hello, World"</span>
+
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1 === o2: "</span>, o1 === o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">false</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1.prototype  === o2.prototype: "</span>, o1.<span style="color: #7aa6da;">prototype</span>  === o2.<span style="color: #7aa6da;">prototype</span><span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">ture</span>
+</pre>
+</div>
+
+<pre class="example">
+o1 === o2:  false
+o1.prototype  === o2.prototype:  true
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org58808c5" class="outline-3">
+<h3 id="org58808c5"><span class="section-number-3">2.2</span> Function</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-js" id="orgf0cd304"><span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">o1</span> = <span style="color: #b9ca4a;">function</span><span style="color: #eaeaea;">()</span> <span style="color: #eaeaea;">{}</span>
+<span style="color: #b9ca4a;">var</span> <span style="color: #e7c547;">o2</span> = <span style="color: #b9ca4a;">new</span> <span style="color: #7aa6da;">Function</span><span style="color: #eaeaea;">()</span>;
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1 == o2: "</span>, o1 == o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">false</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"o1 === o2: "</span>, o1 === o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">false</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"typeof o1: "</span>, <span style="color: #b9ca4a;">typeof</span> o1<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">function</span>
+console.log<span style="color: #eaeaea;">(</span><span style="color: #70c0b1;">"typeof o2: "</span>, <span style="color: #b9ca4a;">typeof</span> o2<span style="color: #eaeaea;">)</span> <span style="color: #969896; font-style: italic;">// </span><span style="color: #969896; font-style: italic;">function</span>
+</pre>
+</div>
+
+
+<pre class="example">
+o1 == o2:  false
+o1 === o2:  false
+typeof o1:  function
+typeof o2:  function
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2087e53" class="outline-2">
+<h2 id="org2087e53"><span class="section-number-2">3</span> 其他資料</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li><a href="http://zero.milosz.ca/">Zero in JavaScript</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2020-01-13 一 16:52</p>
+<p class="author">&#20316;&#32773;: lagagain</p>
+<p class="date">Created: 2020-01-14 二 11:56</p>
+</div>
+</body>
+</html>

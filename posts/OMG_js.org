@@ -24,11 +24,6 @@ node --version
 
 ** 'string' 和 String不同
 
-
-   #+begin_example
-   ```js
-   #+end_example
-
    #+name: string_vs_String
    #+begin_src js :results output :exports both
    var o1 = 'Hello World';
@@ -38,10 +33,6 @@ node --version
    console.log("typeof o1: ", typeof o1) // 'string'
    console.log("typeof o2: ", typeof o2) // 'object
    #+end_src
-   #+begin_example
-```
-   #+end_example
-
 
    #+RESULTS: string_vs_String
    : o1 == o2:  true
@@ -51,9 +42,6 @@ node --version
 
    原來 =new String()= 和原生 =string= 出來的不是同個類別...
 
-   #+begin_example
-```js
-   #+end_example
    #+name: string_instanceis?
    #+begin_src js :results output :exports both
    var o1 = 'Hello World';
@@ -67,9 +55,6 @@ node --version
      console.debug(e)
    }
    #+end_src
-   #+begin_example
-```
-   #+end_example
 
    #+RESULTS: string_instanceis?
    #+begin_example
@@ -90,9 +75,6 @@ node --version
 
     ='string'= 不能增加屬性或方法
 
-    #+begin_example
-```js
-    #+end_example
     #+name: string_cant_add_method
     #+begin_src js :results output :exports both
     var car = 'Hello World';
@@ -113,9 +95,6 @@ node --version
 
     console.log("car: ", car) // 'Hello World'
     #+end_src
-    #+begin_example
-```
-    #+end_example
 
     #+RESULTS: string_cant_add_method
     : TypeError: car.start is not a function
@@ -130,9 +109,6 @@ node --version
 
     但是 =String= 產生的物件可以...
 
-    #+begin_example
-```js
-    #+end_example
     #+name: but_String_can
     #+begin_src js :results output :exports both
     var car = new String('Hello World');
@@ -143,9 +119,6 @@ node --version
     console.log("car.start(): ", car.start()); // true
     console.log("car: ", car) // [String: 'Hello Wrold'] { name: 'BMW', start: [Function] }
     #+end_src
-    #+begin_example
-```
-    #+end_example
 
     #+RESULTS: but_String_can
     : car.start():  true
@@ -153,9 +126,6 @@ node --version
 
     兩個都會受到 =String.prototype= 的影響Orz...
 
-    #+begin_example
-```js
-    #+end_example
     #+name: String.prototype_to_string
     #+begin_src js :results output :exports both
     var car = 'Hello World';
@@ -174,9 +144,6 @@ node --version
 
     --------
 
-    #+begin_example
-```js
-    #+end_example
     #+name: String.prototype_to_String
     #+begin_src js :results output :exports both
     var car = new String('Hello World');
@@ -188,18 +155,12 @@ node --version
     var txt = 'Will';
     console.log("txt.name: ", txt.name) // "BMW"
     #+end_src
-    #+begin_example
-```
-    #+end_example
 
     #+RESULTS: String.prototype_to_String
     : txt.name:  BMW
 
     因為他們的 =prototype= 指向同一個物件...
 
-    #+begin_example
-```js
-    #+end_example
     #+name: String.prototype_and_string.prototype
     #+begin_src js :results output :exports both
     o1 = new String("Hello, World")
@@ -208,18 +169,13 @@ node --version
     console.log("o1 === o2: ", o1 === o2) // false
     console.log("o1.prototype  === o2.prototype: ", o1.prototype  === o2.prototype) // ture
     #+end_src
-    #+begin_example
-```
-    #+end_example
 
     #+RESULTS: String.prototype_and_string.prototype
     : o1 === o2:  false
     : o1.prototype  === o2.prototype:  true
 
 ** Function
-   #+begin_example
-```js
-   #+end_example
+
    #+name: function_instances
    #+begin_src js :results output :exports both
    var o1 = function() {}
@@ -229,9 +185,7 @@ node --version
    console.log("typeof o1: ", typeof o1) // function
    console.log("typeof o2: ", typeof o2) // function
    #+end_src
-   #+begin_example
-```
-   #+end_example
+
 
    #+RESULTS: function_instances
    : o1 == o2:  false
