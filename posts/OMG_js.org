@@ -2,6 +2,7 @@
 #+title: OMG JavaScript
 #+date: <2020-01-13 一 16:52>
 #+author: lagagain
+#+options: toc:nil
 #+export_file_name: ../docs/OMG_js
 
 * 前言
@@ -91,6 +92,8 @@ node --version
 
     txt.name // "BMW"
   #+end_src
+
+--------
 
   #+begin_src js
     var car = new String('Hello World');

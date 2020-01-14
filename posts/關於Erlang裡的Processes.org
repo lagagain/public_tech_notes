@@ -1,6 +1,7 @@
 #+title: 關於Erlang裡的Processes
 #+date: <2020-01-13 一 14:22>
 #+author: lagagain
+#+options: toc:nil
 #+export_file_name: ../docs/關於Erlang裡的Processes
 
 

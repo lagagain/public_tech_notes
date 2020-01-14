@@ -1,16 +1,4 @@
 
-# Table of Contents
-
-1.  [前言](#orged1a6fb)
-2.  [各個範例嘗試](#org33fa39f)
-    1.  ['string' 和 String不同](#org6abfdf1)
-        1.  [但是'string'會受到String.prototype影響&#x2026;](#orga24d854)
-    2.  [Function](#orgda6cd54)
-3.  [其他資料](#org35ad2da)
-
-
-
-<a id="orged1a6fb"></a>
 
 # 前言
 
@@ -23,14 +11,10 @@
     v12.13.0
 
 
-<a id="org33fa39f"></a>
-
 # 各個範例嘗試
 
     node --version
 
-
-<a id="org6abfdf1"></a>
 
 ## 'string' 和 String不同
 
@@ -48,8 +32,6 @@
     
     o1 instanceof string // Erro, not define string
 
-
-<a id="orga24d854"></a>
 
 ### 但是'string'會受到String.prototype影響&#x2026;
 
@@ -91,6 +73,8 @@
     
     txt.name // "BMW"
 
+---
+
     var car = new String('Hello World');
     String.prototype.name = "BMW";
     String.prototype.start = function()
@@ -109,8 +93,6 @@
     o1.prototype  === o2.prototype // ture
 
 
-<a id="orgda6cd54"></a>
-
 ## Function
 
     var o1 = function() {}
@@ -120,8 +102,6 @@
     typeof o1 // function
     typeof o2 // function
 
-
-<a id="org35ad2da"></a>
 
 # 其他資料
 

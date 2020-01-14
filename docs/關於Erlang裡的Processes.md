@@ -1,14 +1,4 @@
 
-# Table of Contents
-
-1.  [前情提要](#orgad248bb)
-2.  [前情提要2](#orge9072fd)
-3.  [[進入正題]關於Erlang裡的Processes](#orgdc03bf5)
-4.  [Distributed Programming](#org9f6dd86)
-
-
-
-<a id="orgad248bb"></a>
 
 # 前情提要
 
@@ -27,16 +17,12 @@
 Golang)，不太可能是他說的新技術，於是乎我又看了一番(第二次)，這是我的簡短紀錄。
 
 
-<a id="orge9072fd"></a>
-
 # 前情提要2
 
 我在加入社團後，看了高見龍的「[你看過 Elixir 嗎？如果沒有，現在讓你看看！](https://kaochenlong.com/2017/10/23/have-you-met-elixir/)」，其中Pipe Operator像極了
 我寫過得[Pipe Function](https://www.lagagain.com/post/%E7%94%A8python%E5%AF%A6%E7%8F%BEcallable-classfp%E6%9B%B4%E5%A5%BD%E5%AF%AB/#771-jewels-and-stones)。此外，一番調查下，Haskell也有[flow](https://hackage.haskell.org/package/flow-1.0.19/docs/Flow.html)的操作，也很靈活。(近日我可能會重看Hasekll趣
 學指南，覺得以前沒看懂的東西現在應該可以懂了)
 
-
-<a id="orgdc03bf5"></a>
 
 # [進入正題]關於Erlang裡的Processes
 
@@ -70,8 +56,6 @@ thread，或是Green Thread（朋友提出來的，這個我看到有印象，�
 -   網路
 -   （當然還有檔案系統，檔案交換）
 
-
-<a id="org9f6dd86"></a>
 
 # Distributed Programming
 
