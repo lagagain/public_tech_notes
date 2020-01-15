@@ -2,7 +2,7 @@
 #+date: <2020-01-15 三 15:05>
 #+author: lagagain
 #+options: toc:nil
-#+export_file_name: ../docs/關於Erlang裡的Processes
+#+export_file_name: ../docs/CLOS的combination
 
 
 部份參考：https://acl.readthedocs.io/en/latest/zhTW/ch11.html#method-combination

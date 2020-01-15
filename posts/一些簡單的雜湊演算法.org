@@ -1,0 +1,105 @@
+# -*- coding: utf-8; -*-
+#+title: 一些簡單的雜臭演算法
+#+date: <2020-01-15 三 15:05>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/一些簡單的雜臭演算法
+
+第一次看到應該是在...
+
+1. Lua源碼欣賞？
+2. Python源碼剖析？
+3. 構件你自己的lisp？
+4. 自製邊程語言？
+
+我忘了😆，well...反正就是一本關於程式語言實現相關的書籍，其中提到一個簡單的雜奏演算法。儘管其碰撞率可能還是很高，或說有很好的演算法，但他很簡單、易實現。
+
+今天（<2020-01-15 三>）會在去查找相關的演算法，主要是因為目前主流的高階程式語言，基本都有提供HashTable、Dictorary等相似的特性。我覺得了解如何實現會比較好，如同我在[[https://lagagain.wordpress.com/2016/08/21/%25e7%2582%25ba%25e4%25bb%2580%25e9%25ba%25bc%25e6%2588%2591%25e5%25be%2588%25e5%25b0%2591%25e7%2594%25a8%25e7%25ac%25ac%25e4%25b8%2589%25e6%2596%25b9%25e5%258c%2585/][為什麼我很少用第三方包?]]提及的「Node.js消失的11行程式碼」和[[https://lagagain.wordpress.com/2020/01/07/%25e3%2580%2590%25e8%25ae%2580%25e6%259b%25b8%25e5%25bf%2583%25e5%25be%2597%25e3%2580%2591gitbook%25e7%25a8%258b%25e5%25ba%258f%25e5%2593%25a1%25e7%259a%2584%25e8%2587%25aa%25e6%2588%2591%25e4%25bf%25ae%25e9%25a4%258a/][另一本書]]提到的：
+
+
+*※ 注意：提到的程式碼可能來自[[%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99][參考資料]]，並不建議直接拿來使用，請自行斟酌，並修改使用。*
+
+#+begin_quote
+無論是不為技術人員，我覺得都應該堅持寫作。寫作帶給你的是思維的總結，因為有些事情你只是去想，貌似很簡單。當你深入思考，其實又是另一個境界。
+#+end_quote
+
+* TODO LCG演算法
+  :LOGBOOK:
+  - Note taken on [2020-01-15 三 20:21] \\
+    [TODO] 用Common Lisp改寫範例
+  :END:
+
+
+** 參考範例
+#+begin_src python
+def lcg(modulus, a, c, seed):
+    while True:
+        seed = (a * seed + c) % modulus
+        yield seed
+#+end_src
+
+#+begin_src c
+hashAddress = 5381;
+for (counter = 0; word[counter]!='\0'; counter++){
+    hashAddress = ((hashAddress << 5) + hashAddress) + word[counter];
+}
+#+end_src
+
+* TODO djb2
+  :LOGBOOK:
+  - Note taken on [2020-01-15 三 20:21] \\
+    [TODO] 用Common Lisp改寫範例
+  :END:
+
+** 參考範例
+#+begin_src python
+// generates a hash value for a sting
+// same as djb2 hash function
+//構造雜湊函式 f（hash）= hash * 33 + c
+unsigned int CountMinSketch::hashstr(const char *str) {
+  unsigned long hash = 5381;
+  int c;
+  while (c = *str++) {
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  }
+  return hash;
+}
+#+end_src
+
+
+* TODO sdbm
+
+** 參考範例
+#+begin_src c
+hashAddress = 0;
+for (counter = 0; word[counter]!='\0'; counter++){
+    hashAddress = word[counter] + (hashAddress << 6) + (hashAddress << 16) - hashAddress;
+}
+#+end_src
+
+* TODO Adler32
+
+** 參考範例
+#+begin_src c
+uint32_t adler32(const void *buf, size_t buflength) {
+     const uint8_t *buffer = (const uint8_t*)buf;
+
+     uint32_t s1 = 1;
+     uint32_t s2 = 0;
+
+     for (size_t n = 0; n < buflength; n++) {
+        s1 = (s1 + buffer[n]) % 65521;
+        s2 = (s2 + s1) % 65521;
+     }
+     return (s2 << 16) | s1;
+}
+
+// ...
+
+hashAddress = adler32(word, strlen(word));
+#+end_src
+
+* 參考資料
+
+- [[https://www.itread01.com/content/1542088389.html][djb2：一個產生簡單的隨機分佈的雜湊函式]]
+- [[https://stackoverflow.com/questions/14409466/simple-hash-functions][{StackOverflow}Simple hash functions]]
