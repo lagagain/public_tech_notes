@@ -15,3 +15,4 @@
 - [ ] [[https://www.businessweekly.com.tw/careers/blog/14184][只有高中畢業，竟在聯發科、工研院當顧問，還讓成大破格錄取當老師？]]
 - [ ] http://wiki.csie.ncku.edu.tw/User/jserv
 - [ ] [[https://mariusschulz.com/blog/use-cases-for-javascripts-iifes][Use Cases for JavaScript's IIFEs]]
+- [X] [[https://m.gamer.com.tw/forum/C.php?bsn=60076&page=&snA=5444020&last=][台灣軟體業業界現況詳解、軟體工程師指南]]
