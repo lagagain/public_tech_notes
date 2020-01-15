@@ -1,0 +1,51 @@
+#+title: CLOS的combination
+#+date: <2020-01-15 三 15:05>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/關於Erlang裡的Processes
+
+
+部份參考：https://acl.readthedocs.io/en/latest/zhTW/ch11.html#method-combination
+* 範例
+
+#+name: example
+#+begin_src lisp
+  (defgeneric price (x)
+    (:method-combination +))
+
+  (defclass jacket () ())
+  (defclass trousers () ())
+  (defclass suit (jacket trousers) ())
+
+  (defmethod price + ((jk jacket)) 350)
+  (defmethod price + ((tr trousers)) 200)
+
+  (price (make-instance 'suit))
+#+end_src
+
+#+RESULTS: example
+: 550
+* override (price 'suit)
+
+Override後，仍會用上 =+= combination。
+
+#+name: override (price 'suit)
+#+begin_src lisp
+  (defmethod price + ((s suit))
+    40)
+  (price (make-instance 'suit))
+#+end_src
+
+#+RESULTS: override (price 'suit)
+: 590
+* 可使用的combination
+
+- +
+- and
+- append
+- list
+- max
+- min
+- nconc
+- or
+- progn
