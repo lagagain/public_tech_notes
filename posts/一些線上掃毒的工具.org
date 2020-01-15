@@ -1,0 +1,11 @@
+# -*- coding: utf-8; -*-
+#+title: 一些線上掃毒的工具
+#+date: <2020-01-15 三 20:30>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/一些線上掃毒的工具
+
+
+
+- [[https://www.virustotal.com/gui/home/upload][VIRUSTOTAL]]
+- [[https://www.shodan.io/][SHODAN]]
