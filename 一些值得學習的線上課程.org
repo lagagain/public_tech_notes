@@ -1,0 +1,17 @@
+# -*- coding: utf-8; -*-
+#+title: 一些值得學習的線上課程
+#+date: <2020-01-15 三 20:30>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/一些值得學習的線上課程
+* 值得上的線上課程
+
+- [ ] [[https://blog.huli.tw/2016/03/28/cs50-programming-course-like-ocean/][如海洋般的程式課程：CS50]]
+- [ ] [[https://blog.techbridge.cc/2019/12/27/from-nand-to-tetris%25EF%25BC%259A%25E6%2583%25B3%25E7%2590%2586%25E8%25A7%25A3%25E9%259B%25BB%25E8%2585%25A6%25E9%2581%258B%25E4%25BD%259C%25EF%25BC%258C%25E5%25B0%25B1%25E5%2585%2588%25E5%2581%259A%25E5%2587%25BA%25E4%25B8%2580%25E5%258F%25B0%25E5%2590%25A7%25EF%25BC%2581/][From Nand To Tetris：想理解電腦運作，就先做出一台吧！]]
+
+
+* 其他待讀文章
+
+- [ ] [[https://www.businessweekly.com.tw/careers/blog/14184][只有高中畢業，竟在聯發科、工研院當顧問，還讓成大破格錄取當老師？]]
+- [ ] http://wiki.csie.ncku.edu.tw/User/jserv
+- [ ] [[https://mariusschulz.com/blog/use-cases-for-javascripts-iifes][Use Cases for JavaScript's IIFEs]]
