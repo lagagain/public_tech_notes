@@ -1,0 +1,15 @@
+#+title: 一些Common Creative資源
+#+date: <2020-01-16 四 15:28>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/一些Common Creative資源
+
+
+| 名稱             | 圖片 | 音樂 | 影片 | 音效 |
+|------------------+------+------+------+------|
+| [[https://www.pexels.com/][Pexels]]           | X    |      |      |      |
+| [[https://www.videvo.net/][videvo]]           |      | X    | X    | X    |
+| [[https://mazwai.com/][Free video clips]] | X    |      |      |      |
+| [[https://wedistill.io/][DISTILL]]          |      |      | X    |      |
+| [[https://www.coverr.co/][coverr]]           |      |      | X    |      |
+| [[https://www.lifeofvids.com/collections/clouds/][Life of vids]]     |      |      | X    |      |
