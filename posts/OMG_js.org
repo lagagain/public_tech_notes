@@ -19,9 +19,6 @@ node --version
 
 
 * 各個範例嘗試
-
-
-
 ** 'string' 和 String不同
 
    #+name: string_vs_String
@@ -174,6 +171,44 @@ node --version
     : o1 === o2:  false
     : o1.prototype  === o2.prototype:  true
 
+
+** 兩個等號和三個等號
+
+#+begin_src js :results output :exports both
+  console.log("1 == 1: ", 1 == 1)
+  console.log("1 === 1: ", 1 === 1)
+  console.log("1 == 1 == 1: ", 1 == 1 == 1)
+  console.log("1 === 1 === 1: ", 1 === 1 === 1)
+
+  console.log('"abc" == "abc": ', "abc" == "abc")
+  console.log('"abc" === "abc": ', "abc" === "abc")
+  console.log('"abc" == "abc" == "abc": ', "abc" == "abc" == "abc")
+  console.log('"abc" === "abc" === "abc": ', "abc" === "abc" === "abc")
+
+  console.log("----------------------")
+
+  console.log('1 == true: ', 1 == true)
+  console.log('1 === true: ', 1 === true)
+  console.log('10 == true: ', 10 == true)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+1 == 1:  true
+1 === 1:  true
+1 == 1 == 1:  true
+1 === 1 === 1:  false
+"abc" == "abc":  true
+"abc" === "abc":  true
+"abc" == "abc" == "abc":  false
+"abc" === "abc" === "abc":  false
+----------------------
+1 == true:  true
+1 === true:  false
+10 == true:  false
+#+end_example
+
+
 ** Function
 
    #+name: function_instances
@@ -192,6 +227,7 @@ node --version
    : o1 === o2:  false
    : typeof o1:  function
    : typeof o2:  function
+
 
 * 其他資料
 
