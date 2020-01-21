@@ -1,0 +1,50 @@
+# -*- org-export-babel-evaluate: nil; -*-
+#+title: OMG 浮點數
+#+date: <2020-01-21 二 15:23>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/OMG_float
+
+
+* OMG float 加法
+
+js版
+
+#+name: [js] float eq after add
+#+begin_src js :results output code :exports both
+var [a, b] = [3.2, 0.1]
+console.log("a + b == 3.3 //=> " , a + b == 3.3)
+console.log("a + b === 3.3 //=> " , a + b === 3.3)
+console.log("a + b //=> ", a + b)
+console.log("a + b < 3.31 && a + b > 3.29 //=> " , a + b < 3.31 && a + b > 3.29)
+#+end_src
+
+Output:
+#+RESULTS: [js] float eq after add
+#+begin_src js
+a + b == 3.3 //=>  false
+a + b === 3.3 //=>  false
+a + b //=>  3.3000000000000003
+a + b < 3.31 && a + b > 3.29 //=>  true
+#+end_src
+
+
+python版
+
+#+name: [py] float eq after add
+#+begin_src python :results output code :exports both
+a, b = 3.2, 0.1
+print("a + b == 3.3 #=> {}".format( a + b == 3.3))
+print("a + b is 3.3 #=> {}".format( a + b is 3.3))
+print("a + b #=> {}".format( a + b))
+print("a + b < 3.31 and a + b > 3.29 #=> {}".format( a + b < 3.31 and a + b > 3.29))
+#+end_src
+
+Output:
+#+RESULTS: [py] float eq after add
+#+begin_src python
+a + b == 3.3 #=> False
+a + b is 3.3 #=> False
+a + b #=> 3.3
+a + b < 3.31 and a + b > 3.29 #=> True
+#+end_src
