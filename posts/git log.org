@@ -1,0 +1,30 @@
+#+title: 關於Git Log的寫法
+#+date: <2020-01-21 二 17:38>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/關於Git Log的寫法
+
+
+一直以來寫文章的log我都蠻懶的，直接New Post, New Note之類的。雖然開發上會寫多一些，Refer Issue、log title、description等等基本都會寫，不過總還是找不到一個感覺比較好的寫法。(就覺得有些東西還可以在調整)。
+
+剛剛看到[[https://ithelp.ithome.com.tw/articles/10208324][git log 也可以糙!!]]發現可以在Title在加上類別(category)(或許也可以在description加tag?)。以下是一些可以參考來用的類別：
+
+
+
+| 英文                                       | 意義                       |
+|--------------------------------------------+----------------------------|
+| feat (feature)                             | 新增                       |
+| fix (bug fix)                              | 修正                       |
+| docs (documentation)                       | 增加文件                   |
+| style (formatting, missing semi colons, …) | 改變程式碼的排版           |
+| refactor                                   | 重構                       |
+| test (when adding missing tests)           | 增加測試(回報狀況)         |
+| chore (maintain)                           | +苦功 (含蓋上面全部？ 其它)+ |
+
+
+Example:
+
+#+begin_example
+  feat: map view for project location
+  fix: custom field empty in project form
+#+end_example
