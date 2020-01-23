@@ -1,0 +1,103 @@
+#+title: 一些Common Lisp裡loop macro的範例
+#+date: <2020-01-23 四 11:44>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/Some_Example_for_loop_macro_In_Common_lisp
+
+* for 0 to 10
+
+#+name: create_list
+#+begin_src lisp :results output
+  (print (loop for i from 0 to 10 collect i))
+#+end_src
+
+#+RESULTS: create_list
+: (0 1 2 3 4 5 6 7 8 9 10)
+
+
+* for list
+#+name: print_list
+#+begin_src lisp :results output :var list='(1 2 3 4 5 6 7 8 9)
+  (loop for item in list do (print item))
+#+end_src
+
+#+RESULTS: print_list
+#+begin_example
+1
+2
+3
+4
+5
+6
+7
+8
+9
+#+end_example
+
+#+name: calculate_and_print_list
+#+begin_src lisp :results output :var list='(1 2 3 4 5 6 7 8 9)
+  (loop for item in list
+     do (print (* item item))
+     collect (* item item))
+#+end_src
+
+#+RESULTS: calculate_and_print_list
+#+begin_example
+1
+4
+9
+16
+25
+36
+49
+64
+81
+#+end_example
+
+#+begin_src lisp :results output :var list='(1 2 3 4 5 6 7 8 9)
+  (print(loop for item in list collect (* item item)))
+#+end_src
+
+#+RESULTS:
+:
+: (1 4 9 16 25 36 49 64 81)
+
+* for hash-table
+
+#+name: for hash-table
+#+begin_src lisp :results output
+  (defvar *h* (make-hash-table :test 'equal))
+  (defun make-key (i) (format nil "C~A" i))
+  (dotimes (i 10)
+    (setf (gethash (make-key i) *h*) i))  ;; create {"C0": 0, "C1": 1,..., "C9":9}
+
+  ;;(loop for k being the hash-key of *h* do (print k))
+  (loop for v being each hash-value of *h*
+     using (hash-key k)
+     do (format t "~&key: ~A, value: ~A~%" k v))
+#+end_src
+
+#+RESULTS: for hash-table
+#+begin_example
+key: C0, value: 0
+key: C1, value: 1
+key: C2, value: 2
+key: C3, value: 3
+key: C4, value: 4
+key: C5, value: 5
+key: C6, value: 6
+key: C7, value: 7
+key: C8, value: 8
+key: C9, value: 9
+#+end_example
+
+
+* 參考資料
+
+- [[http://www.lispworks.com/documentation/HyperSpec/Body/m_loop.htm][HyperSpec]]
+- [[http://www.unixuser.org/~euske/doc/cl/loop.html][Common Lisp's Loop Macro Examples for Beginners]]
+- [[http://rosettacode.org/wiki/List_comprehensions#Common_Lisp][ROSETTACODE]]
+- Other
+  - [[https://docs.rs/cute/0.3.0/cute/][Rust-lang Package Macro - Cute]]
+  - [[https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Operators/Array_comprehensions][{Obsolete}{MDN} Array comprehensions]]
+  - [[https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Operators/Generator_comprehensions][{Obsolete}{MDN} Generator comprehensions]]
