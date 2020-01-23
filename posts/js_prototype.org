@@ -1,0 +1,31 @@
+# -*- org-export-babel-evaluate: nil; -*-
+#+title: JS prototype chain
+#+date: <2020-01-24 五 00:08>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/js_prototype
+
+
+#+name: mynew
+#+begin_src js :results none
+function mynew(f){
+  var obj = {};
+  obj.__proto__ = f.prototype;
+  obj.constructor(1,3);
+  return obj;
+}
+#+end_src
+
+
+* references
+  :LOGBOOK:
+  - Note taken on [2020-01-24 五 02:41] \\
+    * 單例模式或許會用到
+    - [[https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Classes/static][static]]
+  :END:
+
+- [[https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Classes/constructor][constructor]]
+- [[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/instanceof][instanceof]]
+- [[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new][new operator]]
+- [[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new.target][new.target]]
+- [[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/prototype][Function.prototype]]
