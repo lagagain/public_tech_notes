@@ -1,0 +1,20 @@
+#+title: Emacs 求生手冊
+#+date: <2020-01-24 五 02:47>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/Emacs 求生手冊
+* 無法複製貼上
+
+出現錯誤：
+
+#+begin_example
+emacs (error "Selection owner couldn't convert" UTF8_STRING)
+#+end_example
+
+** 解決辦法
+
+清除[[https://superuser.com/questions/546619/clear-the-kill-ring-in-emacs][kill ring]]。
+
+#+begin_src elisp :results none
+(setq kill-ring nil)
+#+end_src
