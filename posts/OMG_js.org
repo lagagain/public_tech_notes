@@ -229,6 +229,157 @@ node --version
    : typeof o2:  function
 
 
+** Number
+   CLOSED: [2020-01-27 一 16:40]
+   :LOGBOOK:
+   - State "DONE"       from "NEXT"       [2020-01-27 一 16:40]
+   :END:
+
+=Number= 有兩個靜態屬性 =MAX_SAFE_INTEGER= 和 =MAX_VALUE=
+（還有 =MIN_VALUE= ，不過這邊只先討論一邊的情況）
+
+=MAX_VALUE= 和 =MIN_VALUE= 表示了 =Number= 可以表示的範圍，超過有可能就會變成 =Infinity= 或是 =NaN= 。儘管如此， =Number= 從電腦科學上來看，除了整數還包含了浮點數，其 =MAX_VALUE= 和 =MIN_VALUE= 通常以科學記號表示。而其整數，雖然可以表示大數，卻存在安全界線，依規定其值是 =2^53= 內。看看以下範例：
+
+#+name: integer range
+#+begin_src js :results output :exports both
+  console.log("Number.MAX_SAFE_INTEGER: ", Number.MAX_SAFE_INTEGER)
+  console.log("2**53 - 1== Number.MAX_SAFE_INTEGER: ", 2**53 - 1== Number.MAX_SAFE_INTEGER)
+
+  a = 2**53
+
+  console.log("a: ", a)
+  console.log("a == a + 1: ", a == a + 1)
+  console.log("a == a + 2: ", a == a + 2)
+  console.log("a == a + 3: ", a == a + 3)
+
+  console.log("a + 1: ", a + 1)
+  console.log("a + 2: ", a + 2)
+  console.log("a + 3: ", a + 3)
+
+  console.log("Number.MAX_SAFE_INTEGER < MAX_VALUE: ", Number.MAX_SAFE_INTEGER < Number.MAX_VALUE)
+
+  console.log("Number.MAX_VALUE: ", Number.MAX_VALUE)
+  console.log("Number.MIN_VALUE: ", Number.MIN_VALUE)
+#+end_src
+
+Output:
+
+#+RESULTS: integer range
+#+begin_example
+Number.MAX_SAFE_INTEGER:  9007199254740991
+2**53 - 1== Number.MAX_SAFE_INTEGER:  true
+a:  9007199254740992
+a == a + 1:  true
+a == a + 2:  false
+a == a + 3:  false
+a + 1:  9007199254740992
+a + 2:  9007199254740994
+a + 3:  9007199254740996
+Number.MAX_SAFE_INTEGER < MAX_VALUE:  true
+Number.MAX_VALUE:  1.7976931348623157e+308
+Number.MIN_VALUE:  5e-324
+#+end_example
+
+=a + 1= 值竟與 =a= 相等？？這是因為EMCAScript無法正常表示 =9007199254740993= ，會得到 =9007199254740992= ，所以可能還會看到以下奇怪現象：
+
+#+begin_src js :results output :exports both
+  var a = Number.MAX_SAFE_INTEGER + 1 // 9007199254740992
+
+  for(var i = 0; i < 5; i++){
+    a = a + 1;
+    console.log(a)
+  }
+#+end_src
+
+這結果會全顯示 =9007199254740992= 。
+
+#+RESULTS:
+: 9007199254740992
+: 9007199254740992
+: 9007199254740992
+: 9007199254740992
+: 9007199254740992
+
+
+在負數也有相同情況：
+
+#+begin_src js :results output :exports both
+  var a = Number.MAX_SAFE_INTEGER + 1 // 9007199254740992
+  a = -a
+  for(var i = 0; i < 5; i++){
+    a = a - 1;
+    console.log(a)
+  }
+#+end_src
+
+Output:
+
+#+RESULTS:
+: -9007199254740992
+: -9007199254740992
+: -9007199254740992
+: -9007199254740992
+: -9007199254740992
+
+
+越過 =9007199254740993= 後不代表就正常了
+
+#+begin_src js :results output :exports both
+  var a = Number.MAX_SAFE_INTEGER + 1 // 9007199254740992
+  a = a +2
+  for(var i = 0; i < 5; i++){
+    a = a + 1;
+    console.log(a)
+  }
+#+end_src
+
+在我測試的環境下，上面程式碼依然呈現相同數字：
+
+#+RESULTS:
+: 9007199254740996
+: 9007199254740996
+: 9007199254740996
+: 9007199254740996
+: 9007199254740996
+
+
+儘管加法看上去有變，卻可能是錯誤的數值。
+
+#+begin_src js :results output :exports both
+  var a = Number.MAX_SAFE_INTEGER + 1 // 9007199254740992
+  var pre_str = "900719925474099"
+  a = a + 2 // 9007199254740992
+  for(var i = 0; i < 5; i++){
+    var last_str = (i+4).toString();
+    console.log(`a + ${i}: `, a + i)
+    console.log(`a + ${i} == ${pre_str + last_str}: `, (a + i).toString() == (pre_str + last_str))
+    console.log("------------")
+  }
+#+end_src
+
+
+Output:
+
+#+RESULTS:
+#+begin_example
+a + 0:  9007199254740994
+a + 0 == 9007199254740994:  true
+------------
+a + 1:  9007199254740996
+a + 1 == 9007199254740995:  false
+------------
+a + 2:  9007199254740996
+a + 2 == 9007199254740996:  true
+------------
+a + 3:  9007199254740996
+a + 3 == 9007199254740997:  false
+------------
+a + 4:  9007199254740998
+a + 4 == 9007199254740998:  true
+------------
+#+end_example
+
+
 * 其他資料
 
   - [[http://zero.milosz.ca/][Zero in JavaScript]]
