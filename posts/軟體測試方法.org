@@ -78,6 +78,7 @@
 * 參考資料
 
 - [[https://ellis-wu.github.io/2015/09/04/test-method-introduction/][軟體測試方法]]
+- [[https://zh.wikipedia.org/zh-tw/%25E8%25BD%25AF%25E4%25BB%25B6%25E6%25B5%258B%25E8%25AF%2595][維基百科]]
 
 * Footnotes
 

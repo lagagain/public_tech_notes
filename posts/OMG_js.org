@@ -230,10 +230,6 @@ node --version
 
 
 ** Number
-   CLOSED: [2020-01-27 一 16:40]
-   :LOGBOOK:
-   - State "DONE"       from "NEXT"       [2020-01-27 一 16:40]
-   :END:
 
 =Number= 有兩個靜態屬性 =MAX_SAFE_INTEGER= 和 =MAX_VALUE=
 （還有 =MIN_VALUE= ，不過這邊只先討論一邊的情況）
@@ -378,6 +374,26 @@ a + 4:  9007199254740998
 a + 4 == 9007199254740998:  true
 ------------
 #+end_example
+
+
+** Array
+
+
+空元素與undefined有不同行為。
+
+arr.length可以被修改。
+
+#+name: 空元素 vs undefined
+#+begin_src js :exports both :results output
+  console.log("0 in [1,, 3]: ",0 in [1,, 3])
+  console.log("0 in [,,]: ",0 in [,,])
+  console.log("0 in [undefined, undefined, undefined]: ",0 in [undefined, undefined, undefined])
+#+end_src
+
+#+RESULTS: 空元素 vs undefined
+: 0 in [1,, 3]:  true
+: 0 in [,,]:  false
+: 0 in [undefined, undefined, undefined]:  true
 
 
 * 其他資料
