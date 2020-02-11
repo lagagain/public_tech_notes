@@ -5,6 +5,8 @@
 #+export_file_name: ../docs/ABCL嘗試筆記
 
 * Hello World(with JSS)
+https://gist.github.com/lagagain/082d8b360f4bf1c4c73f9636a3757a18
+
 #+name: hello.lisp
 #+begin_src lisp
   (require :abcl-contrib)
@@ -12,6 +14,16 @@
 
   (let ((System.out #"System.out"))
     (jcall "println" System.out "Hello, World"))
+
+  (jcall "println" #"java.lang.System.out" "Hello, World")
+  (jcall "println" #"System.out" "Hello, Java")
+
+  (jclass-methods (jclass "java.lang.System"))
+  (jclass-methods (jobject-class "java.lang.System.out"))
+
+  (let ((obj #"java.lang.System.out"))
+    (print obj)
+    (jclass-methods (jclass-of obj)))
 #+end_src
 
 
