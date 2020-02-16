@@ -1,0 +1,40 @@
+#+title: [C]atext()&on_exit()
+#+date: <2020-02-16 日 19:32>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/[C]atext()&on_exit()
+* 在退出之前
+
+可以透過 =on_exit()= 或 =atexit()= 註冊hook。
+** COMMENT 範例
+
+#+begin_src c
+  // about atexit and on_exit: https://www.gnu.org/software/libc/manual/html_node/Cleanups-on-Exit.html
+
+  #include <stdio.h>
+  void byebye();
+  void seeyouagain();
+  int main()
+  {
+      void *p = NULL;
+      atexit(byebye);
+      on_exit(seeyouagain, p);
+      printf("Hello World");
+
+      return 0;
+  }
+
+  void byebye()
+  {
+    printf("\nBye bye~\n");
+  }
+  void seeyouagain()
+  {
+    printf("\nWant see you again.~\n");
+  }
+#+end_src
+
+* 參考資料
+
+- [[https://gist.github.com/lagagain/b807bffca4858a38e44d20d71d1f9f3f][Gist]]
+-[[https://www.gnu.org/software/libc/manual/html_node/Cleanups-on-Exit.html][Cleanups on Exit]]
