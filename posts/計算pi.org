@@ -1,0 +1,20 @@
+#+title: 計算pi
+#+date: <2020-02-17 一 22:48>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/計算pi
+
+之前看維基百科寫過類似的，突然在 [[https://eugeny.github.io/terminus/][terminus]] 看到，紀錄一下。
+
+#+begin_src lua :results output
+k = 1
+x = 0
+
+while k < 1000 do
+    x = x + 1 / (k * k)
+    k = k + 2
+end
+
+print "Almost Pi:"
+print(math.sqrt(x*8))
+#+end_src
