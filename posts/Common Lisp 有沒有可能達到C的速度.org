@@ -1,0 +1,170 @@
+#+title: Common Lisp 有沒有可能達到C的速度
+#+date: <2020-02-17 一 20:28>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/Common Lisp 有沒有可能達到C的速度
+* 組語般的能力 - 簡單的測試
+** 一般寫法
+ #+name: normal hello 10 times
+ #+begin_src lisp :results output
+   (defun hello10 nil 
+     (declare (inline format)
+              (optimize (debug 0)
+                        (safety 0)
+                        (speed 3)))
+     (dotimes (_ 10 nil)
+       (format t "Hello, World~&")))
+
+   (time (hello10))
+ #+end_src
+
+ #+RESULTS: normal
+ #+begin_example
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+ Hello, World
+#+end_example
+
+ #+begin_src lisp disassemble normal :results output
+ (disassemble #'hello10)
+ #+end_src
+
+ #+RESULTS:
+ #+begin_example
+ ; disassembly for HELLO10
+ ; Size: 127 bytes. Origin: #x10036A9EE7
+ ; EE7:       31F6             XOR ESI, ESI                    ; no-arg-parsing entry point
+ ; EE9:       EB6A             JMP L1
+ ; EEB:       0F1F440000       NOP
+ ; EF0: L0:   498B8520020000   MOV RAX, [R13+544]              ; tls: *STANDARD-OUTPUT*
+ ; EF7:       83F861           CMP EAX, 97
+ ; EFA:       480F440425D8B54A20 CMOVEQ RAX, [#x204AB5D8]      ; *STANDARD-OUTPUT*
+ ; F03:       488975F8         MOV [RBP-8], RSI
+ ; F07:       488945F0         MOV [RBP-16], RAX
+ ; F0B:       4883EC10         SUB RSP, 16
+ ; F0F:       488B1582FFFFFF   MOV RDX, [RIP-126]              ; "Hello, World"
+ ; F16:       488BF8           MOV RDI, RAX
+ ; F19:       B904000000       MOV ECX, 4
+ ; F1E:       48892C24         MOV [RSP], RBP
+ ; F22:       488BEC           MOV RBP, RSP
+ ; F25:       B818953120       MOV EAX, #x20319518             ; #<FDEFN WRITE-STRING>
+ ; F2A:       FFD0             CALL RAX
+ ; F2C:       488B45F0         MOV RAX, [RBP-16]
+ ; F30:       4883EC10         SUB RSP, 16
+ ; F34:       488BD0           MOV RDX, RAX
+ ; F37:       B902000000       MOV ECX, 2
+ ; F3C:       48892C24         MOV [RSP], RBP
+ ; F40:       488BEC           MOV RBP, RSP
+ ; F43:       B838EA3220       MOV EAX, #x2032EA38             ; #<FDEFN FRESH-LINE>
+ ; F48:       FFD0             CALL RAX
+ ; F4A:       488B75F8         MOV RSI, [RBP-8]
+ ; F4E:       488D4602         LEA RAX, [RSI+2]
+ ; F52:       488BF0           MOV RSI, RAX
+ ; F55: L1:   4883FE14         CMP RSI, 20
+ ; F59:       7C95             JL L0
+ ; F5B:       BA17001020       MOV EDX, #x20100017             ; NIL
+ ; F60:       488BE5           MOV RSP, RBP
+ ; F63:       F8               CLC
+ ; F64:       5D               POP RBP
+ ; F65:       C3               RET
+#+end_example
+
+
+** 特殊寫法
+
+#+begin_src lisp :results output
+  (defun hello10 nil
+    (let ((i 0))
+      (declare (type  (unsigned-byte 8) i)
+               (inline format)
+               (optimize (debug 0)
+                         (safety 0)
+                         (speed 3)))
+      (tagbody
+       print 
+         (format t "Hello, World~&")
+         (when (< (incf i) 10)
+           (go  print))))
+       nil)
+
+  (time (hello10))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+Hello, World
+#+end_example
+
+ #+begin_src lisp disassemble normal :results output
+ (disassemble #'hello10)
+ #+end_src
+
+ #+RESULTS:
+ #+begin_example
+ ; disassembly for HELLO10
+ ; Size: 146 bytes. Origin: #x10036AA385
+ ; 385:       498B4560         MOV RAX, [R13+96]               ; no-arg-parsing entry point
+                                                               ; thread.binding-stack-pointer
+ ; 389:       488945F0         MOV [RBP-16], RAX
+ ; 38D:       48C745E800000000 MOV QWORD PTR [RBP-24], #x0     ; current_thread
+ ; 395:       660F1F840000000000 NOP
+ ; 39E:       6690             NOP
+ ; 3A0: L0:   498B8520020000   MOV RAX, [R13+544]              ; tls: *STANDARD-OUTPUT*
+ ; 3A7:       83F861           CMP EAX, 97
+ ; 3AA:       480F440425D8B54A20 CMOVEQ RAX, [#x204AB5D8]      ; *STANDARD-OUTPUT*
+ ; 3B3:       488945E0         MOV [RBP-32], RAX
+ ; 3B7:       4883EC10         SUB RSP, 16
+ ; 3BB:       488B157EFEFFFF   MOV RDX, [RIP-386]              ; "Hello, World"
+ ; 3C2:       488BF8           MOV RDI, RAX
+ ; 3C5:       B904000000       MOV ECX, 4
+ ; 3CA:       48892C24         MOV [RSP], RBP
+ ; 3CE:       488BEC           MOV RBP, RSP
+ ; 3D1:       B818953120       MOV EAX, #x20319518             ; #<FDEFN WRITE-STRING>
+ ; 3D6:       FFD0             CALL RAX
+ ; 3D8:       488B45E0         MOV RAX, [RBP-32]
+ ; 3DC:       4883EC10         SUB RSP, 16
+ ; 3E0:       488BD0           MOV RDX, RAX
+ ; 3E3:       B902000000       MOV ECX, 2
+ ; 3E8:       48892C24         MOV [RSP], RBP
+ ; 3EC:       488BEC           MOV RBP, RSP
+ ; 3EF:       B838EA3220       MOV EAX, #x2032EA38             ; #<FDEFN FRESH-LINE>
+ ; 3F4:       FFD0             CALL RAX
+ ; 3F6:       488B45E8         MOV RAX, [RBP-24]
+ ; 3FA:       4883C002         ADD RAX, 2
+ ; 3FE:       488945E8         MOV [RBP-24], RAX
+ ; 402:       4883F814         CMP RAX, 20
+ ; 406:       7C98             JL L0
+ ; 408:       BA17001020       MOV EDX, #x20100017             ; NIL
+ ; 40D:       488BE5           MOV RSP, RBP
+ ; 410:       F8               CLC
+ ; 411:       5D               POP RBP
+ ; 412:       C3               RET
+ ; 413:       CC0F             BREAK 15                        ; Invalid argument count trap
+ ; 415:       CC0F             BREAK 15                        ; Invalid argument count trap
+#+end_example
+
+** C 語言
+
+
+#+begin_src C :tangle hello10.c
+int i;
+for(i=0; i<10; i++){
+    printf("Hello, World\n");
+}
+#+end_src
