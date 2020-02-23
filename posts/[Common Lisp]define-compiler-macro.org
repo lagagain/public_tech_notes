@@ -1,0 +1,35 @@
+#+title: [Common Lisp]define-compiler-macro
+#+date: <2020-02-23 日 23:33>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/[Common Lisp]define-compiler-macro
+
+
+#+begin_src lisp :results output
+  (declaim (ftype (function (fixnum fixnum) fixnum) add))
+
+  (defun add (a b)
+    (declare (type fixnum a b))
+    (the fixnum (+ a b))
+    (+ a b))
+
+
+  (define-compiler-macro add (&whole form a b)
+    (if (and (numberp a)
+             (numberp b))
+        (+ a b)
+        form))
+
+
+  (add 1 2)
+
+
+  (format t "~&~A~&" (macroexpand '(add 1 2)))
+  (format t "~&~A~&" (funcall  (compiler-macro-function 'add) '(add 5 2) nil))
+  (format t "~&~A~&" (funcall  (compiler-macro-function 'add) '(add a 2) nil))
+#+end_src
+
+#+RESULTS:
+: (ADD 1 2)
+: 7
+: (ADD A 2)
