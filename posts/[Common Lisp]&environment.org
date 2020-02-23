@@ -1,0 +1,42 @@
+#+title: [Common Lisp]&environment
+#+date: <2020-02-24 一 05:31>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/[Common Lisp]&environment
+* Example
+  - Note taken on [2020-02-24 一 05:41] \\
+    需要使用 SBCL 執行，因為 =`sb-c::vars= 只有在 SBCL 有。
+    
+    使用 org-babel 執行可能輸出結果有些問題
+  :LOGBOOK:
+  CLOCK: [2020-02-24 一 05:41]--[2020-02-24 一 05:43] =>  0:02
+  :END:
+
+*Run in SBCL*
+
+#+begin_src lisp :results output
+  (defmacro m (&rest rest &environment env)
+    (when env
+      (format t "~&~A~&" (slot-value env 'sb-c::vars)))
+    rest)
+
+  (format t "~%~%run global~&")
+  (m + 1 2 3 4 5) ;; not output anything, return 15
+
+  (format t "~%~%with lexical environment~&")
+  (let ((a 1) (b 2))
+    (m + a b 3 4 5)) ;; output: a=1, b=2; return 15
+#+end_src
+
+#+begin_example
+run global
+NIL
+
+
+with lexical environment
+((B . #<LAMBDA-VAR :%SOURCE-NAME B {100355C613}>)
+ (A . #<LAMBDA-VAR :%SOURCE-NAME A {100355C4C3}>))
+15
+#+end_example
+
+
