@@ -1,0 +1,95 @@
+#+title: [practice]shawon DOM & customElements
+#+date: <2020-03-01 日 17:08>
+#+author: lagagain
+#+options: toc:nil
+#+export_file_name: ../docs/[practice]shawon DOM & customElements
+* Example
+  - Note taken on [2020-03-01 日 17:09] \\
+    Practice Time: 1 Hour and 7 Mins
+
+#+name: index.html
+#+begin_src html  :tangle "./index.html" :mkdirp=yes
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>[Pratice] customElements & shadow DOMDocument</title>
+    </head>
+    <style>
+     h1{
+         color:green;
+     }
+     h2{
+         color:#afab0f;
+     }
+    </style>
+    <body>
+        <my-header>button</my-header>
+        <h1>[Pratice] customElements & shadow DOM</h1>
+        <h2> H2 for test</h2>
+        <my-footer>
+            <div slot="h2">h2: shadow DOM</div>
+            <div slot="h2">Copy - h2: shadow DOM</div>
+        </my-footer>
+    </body>
+
+    <template id="template-my-footer">
+        <style>
+         h1{
+             color: blue;
+         }
+        </style>
+        <h1>this footer</h1>
+        <h2>
+            <slot name="h2">H2 for test</slot>
+        </h2>
+        <button id="alert">alert</button>
+        <div id="copyright">2020 &copy; by lagagain</div>
+    </template>
+    <script src="element.js"></script>
+</html>
+#+end_src
+
+#+begin_src js  :tangle "element.js" :mkdirp=yes
+class myHeader extends HTMLButtonElement {
+    constructor()  {
+        super(); // always call super() first in the constructor.
+        this.addEventListener('click', e => this.drawRipple(e.offsetX, e.offsetY));
+        console.log("define my-header");
+    }
+
+    // Material design ripple animation.
+    drawRipple(x, y) {
+        let div = document.createElement('div');
+        div.classList.add('ripple');
+        this.appendChild(div);
+        div.style.top = `${y - div.clientHeight/2}px`;
+        div.style.left = `${x - div.clientWidth/2}px`;
+        div.style.backgroundColor = "blue";//'currentColor';
+        div.style.color = "white";
+        div.classList.add('run');
+        div.innerHTML = "child";
+        div.addEventListener('transitionend', e => div.remove());
+    }
+
+};
+
+customElements.define('my-header', myHeader, {extends:"button"});
+
+class myFooter extends HTMLElement{
+    constructor(){
+        super();
+        var template = document.querySelector("#template-my-footer");
+        var shadow = this.attachShadow({mode:'open'});
+        shadow.innerHTML = template.innerHTML;
+        this.registMyAlsert();
+    }
+    registMyAlsert(){
+    var copyright = this.shadowRoot.querySelector("#alert");
+        copyright.onclick = ()=>window.alert("alert footer");
+    }
+
+}
+
+customElements.define('my-footer', myFooter);
+#+end_src
