@@ -1,0 +1,187 @@
+#+Title: 有趣！Common Lisp特殊的熱更新（Hot Update）
+#+date: <2019-04-18 四 11:25>
+#+tags: Common Lisp
+#+tags: Hot Update
+#+tags: 熱更新
+#+description: 關於Common Lisp特殊的熱更新，與其他語言實現的比較。
+
+
+Lisp 有許多有趣的特性，今天來來說說熱更新。實際上去玩了一下之後，才發現其實熱更新
+還要分的更細。我們就幾個程式語言來試試，最後還是Lisp的靈活性最高，這也是Lisp同時有
+詞法作用域、動態作用域和全域環境的表現。
+
+
+* 初探Common Lisp裏面的熱更新
+初探Common Lisp裏面的熱更新，首先考慮下面程式碼：
+#+BEGIN_SRC lisp :results output :tangle test.lisp
+
+  (locally
+      (declare (optimize (debug 0)
+                         (speed 0)
+                         (safety 0)))
+    (defun hello (name)
+      (print name))
+
+    ;; change immediately
+    (defun hello_time (times)
+      (loop for i from 1 to times do
+           (hello i)
+           (sleep 1)))
+
+
+    (hello_time 2)
+
+    (defun hello (name)
+      (print (concatenate 'string "Hello, " (write-to-string name))))
+
+    (hello_time 2))
+#+END_SRC
+
+#+RESULTS:
+:
+: 1
+: 2
+: 1
+: 2
+
+
+
+#+BEGIN_SRC lisp :results output
+(defun x nil
+(print 'hello))
+(sleep 5)
+(x)
+#+END_SRC
+
+#+RESULTS:
+: a64a983db5b43eca2507d7716e754cd0
+
+
+
+#+BEGIN_SRC shell :results output :async
+  sleep 3
+  echo "DONE"
+#+END_SRC
+
+#+RESULTS:
+: DONE
+
+#+BEGIN_SRC shell
+echo "HELLO"
+#+END_SRC
+
+#+RESULTS:
+: HELLO
+
+
+* Common Lisp
+
+* Python
+#+BEGIN_SRC python :results output
+  import threading
+  import time
+
+  def hello(name):
+      print("Hello, " + str(name))
+
+  def hello(name):
+      print(name)
+
+  def hello_time(times):
+      for i in range(times):
+          hello(i)
+          time.sleep(1)
+  t1 = threading.Thread(target=hello_time, args=[10])
+  t1.run()
+
+  def hello_time1(times):
+      for i in range(times):
+          hello(i)
+          yield
+
+  y = hello_time1(10)
+
+  next(y)
+
+
+
+  a = 1
+  def f1():
+      a = 2
+      f2()
+
+  def f2():
+      print(a)
+  def f3():
+      global a
+      a = 3
+      f2()
+  def f4():
+      global a
+      _a = a
+      a = 4
+      f2()
+      a = _a
+  f1()
+  f2()
+  f3()
+  f4()
+#+END_SRC
+
+
+#+BEGIN_SRC python :async
+import time
+time.sleep(3)
+print("Hello")
+return "Hello"
+#+END_SRC
+
+#+RESULTS:
+: Hello
+
+* Lua
+#+BEGIN_SRC lua :results output
+  function hello(name)
+     return name
+  end
+
+
+  function hello(name)
+     return "hello, " .. name
+  end
+
+  function hello_time(times)
+     for i=0,times,1 do
+        print(hello(i))
+        coroutine.yield()
+     end
+  end
+
+
+
+
+  co = coroutine.create(hello_time)
+
+  coroutine.resume(co, 10)
+  coroutine.resume(co)
+
+#+END_SRC
+
+* Node.js
+
+#+BEGIN_SRC js :results output
+function hello(name){
+  return name;
+}
+
+function hello(name){
+  return "Hello" + name;
+}
+
+
+function *hello_time(times){
+  for(var i = 0 ; i < times; i++){
+    yield hello(i);
+  }
+}
+#+END_SRC
