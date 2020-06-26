@@ -1,0 +1,90 @@
+#+TITLE:神奇的Common Lisp
+
+
+* Common Lisp
+目前 Lisp 有三大主要分支，Common Lisp、Scheme 和 Clojure。Scheme 作爲精而小巧的分支，非常美麗；而 Clojure 是近來發展出來的分支，建立再 JVM 之上，可以呼叫龐大的 Java 函式，甚至有 ClojureScript 能轉換成 Javascript（ECMAScript）程式，在瀏覽器上執行。
+
+作爲 Lisp 家族中重大的分支之一，Common Lisp 也有非常有魅力的地方。首先他擁有 Lisp 家族的幾個重要特性：S表達式，這讓程式與資料差異不大；REPL，最早擁有互動式環境的語言，最特別的是包含編譯、讀取、執行、除錯都可以透過自己本身執行，加上本身是爲了使用簡單，而可以設計複雜，所以有些深層概念有點讓人難以理解，實做上也相對比 Scheme 來的複雜；垃圾回收，雖然已經不是特色，但作爲始祖，可以說 Lisp 從與 C 不同方面，影響了現在總總程式語言；Macro，不同於 C 的巨集，雖然兩者都叫作 Macro，但是 Lisp 的 Macro 有 Macro 執行時的生態，能夠做到事情比起 C 的巨集來的多。在 C 裡，巨集有巨集使用的指令，像是 =#define= 、 =#if= 等等，但是在 Lisp 的 Macro 區分的不那麼明確，甚至能夠在展開時期，執行 sqrt 等等函式（相對 C 就只是展開而已，這點之後可以略作比較）。因爲 Lisp Macro 的特別，才會有 Rust 稱呼自己的 Macro 是 Lisp 的強大宏能力。這點我不否認，不過 Common Lisp 還有一種 Macro--讀取宏 (Read Macro)，這在其他語言就可以說是非常少見了，連 Clojure 都沒有見到。他能夠改變語法結構 (Syntax)，不過相對來說也不太建議太常使用就是，主要原因是修改 readtable 有時非常危險，如果使用的不同人的程式對於讀取有不同定義的話，可能造成影響 (雖然也有防範手段就是) 。但是因爲 Lisp 的特性，令 Lisp 能夠自己演化出不同的風格 (範式)，本身重要的設計方式是函式型，但是物件導向的風格也已經很成熟 (CLOS, Common Lisp Object System)。甚至能夠在不更動做到增加像是 Python 的裝飾器、C語言風格語法等等。此外，雖然直譯作爲一個常用的執行方式，卻帶有編譯系統，根據不同的實做，可以編譯成 fasl 的 Byte Code、Java 的 Byte Code 甚至原生程式碼 (Native Code)。自動型別推斷、型別參考，卻不代表不能宣告型別，可以很輕易的做二次開發流程，先快速開發 Propotype，在進行型別優化。
+
+* Common Lisp 的實做版本
+Common Lisp 與同家族的 Scheme 一樣，同樣自己有定義標準。也和 C/C++一樣，是先有語言標準，才有實做版本的。目前 Common Lisp 的標準在 2004 年由 ANSI 規定之後就幾乎沒有變過，標準可以在 Common Lisp HyperSpec (CLHS)查詢，主要由 LispWorks 維護。當中包含了 pathname、readtable、stream 等等眾多定義，不過現在常用的執行緒 (thread)、網路 (network)等等高度依賴作業系統的部分並不在摽準裡面 (與 C 一樣)，但是也已經有成熟的跨平臺、跨不同實做版本的第三方 package。
+
+(這些功能通常由實做提供，常見的可能還可以透過 CFFI 去擴充，不過知名的實做版本多都有比 ASNI 標準更豐富的內容 (CFFI 也有點約定成俗，並不在標準裡就是)。因爲並不在標準裡面，所以在不同的實做版本會略有差異。舉例來說，SBCL 可以運行在 Windows、Mac、Linux，甚至在 ARM 架構下，並且提供了 thread、network 的功能，但是這部分卻可能不被 ecl 接受。目前也有第三方套件整合了這個部分，讓程式碼能在不同實做版本都正常執行，是潛標準。我認爲分清楚標準與標準外的內容很重要，因爲在標準內可以實現可攜的演算法，雖然重大的演算法幾乎都可以直接找到，使用套件就是 XD)
+
+接下來就介紹幾個我認爲重要的實做版本：
+1. 開源實做版本
+   1. SBCL
+   2. CCL
+   3. CMUCL
+   4. ABCL (Base on Java JVM)
+   5. ECL（Base on ANSI C, 可以運行在 Android）
+   6. CLISP
+   7. GCL
+2. 商業版本
+   1. Allegro CL
+   2. LispWorks
+   3. *mocl* for OSX, iOS and Android
+3. 潛力股（未達到 ANSI 標準）
+   1. CLASP（Base on C++，LLVM）
+   2. JSCL (Javascript)
+   3. MKCL (ECL fork)
+   4. WCL (embeddable)
+
+MKCL 和 WCL 我不清楚是不是有達到 ANSI 標準拉 (o (*≧▽≦)ツ)，不過 Clasp 建立在 LLVM 上記得也逐漸成熟了，還有看到前幾年的簡報，JSCL 則在最近有人幫忙完成了物件系統。
+
+*建議* ：優先選擇前三個來使用 (三則一)，通常會直接推薦使用 SBCL，不過 CCL 也很不錯，LIENCE 也很友善。ABCL 和 ECL 通常是給有特殊情況的，如果已經很熟悉 Java 了可以考慮使用 ABCL；已經很熟悉 C 就可以考慮使用 ECL。這兩個在表準上差異不大，使用起來其實也沒那麼難，不過直接提供了 JAVA、C 的接口，可以很快的透過 JAVA、C 擴充 (比如已經熟悉 Java 的網路、GUI，就可以比較容易帶入) 。商業版本上 Allegro、LispWorks 都有提供免費版本，購買商業版本的話還可以得到更多 package（LispWorks 好像也對 Android 做支援）。CLISP 對於初學者比較友善，不過已經沒有在維護。 (我一開始是使用 CLISP)
+
+* TODO QuickLisp 和 Roswell
+
+* TODO REPL 環境
+
+* TODO 2-namespace
+
+#+BEGIN_SRC lisp :results output
+  (defvar 跑步 "跑步" "一種運動")
+  (defvar run "running" "a sport")
+
+  (defun 跑步 (誰)
+    (format t "~&~A正在跑步跑步~%" 誰))
+
+  (defun run (name)
+    (format t "~&~A is running.~%" name))
+
+  (format t "~&跑步是~A~%" 跑步)
+  (setf 跑步 "一種運動")
+  (setf run "is a sport")
+  (format t "~&跑步是~A~%" 跑步)
+
+  (跑步 "小明")
+
+  (set-dispatch-macro-character #\# #\o
+                                (lambda (s ch1 ch2)
+                                  (declare (ignore ch1 ch2))
+                                  (let* ((obj (read s))
+                                         (method (read s))
+                                         (args (cdr method)))
+                                    (setf (cdr method) (cons obj args))
+                                    method)))
+
+  (format t "~&~A~%" (nthcdr 1 '(1 2 3 4 5)))
+
+
+  #o"小明" (跑步)
+
+  obj call.lisp
+  (set-dispatch-macro-character #\# #\m
+                                (lambda (s c1 c2)
+                                  (declare (ignore c1 c2))
+                                  (let* ((form (read s))
+                                         (obj (car form))
+                                         (method (cadr form))
+                                         (args (cddr form)))
+                                    `(,method ,obj ,@args))))
+
+  #m ("小明" run)
+  #m ("小明" . (run))
+  #m ("小明" 跑步)
+  #m ("小明" . (跑步))
+#+END_SRC
+
+* TODO C巨集與Lisp Macro
