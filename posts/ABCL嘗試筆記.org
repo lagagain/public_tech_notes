@@ -92,3 +92,70 @@ public class GUI {
     }
 }
 #+end_src
+
+* JavaFX example
+
+#+name: javafx_hello.java
+#+begin_src java
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+public class HelloFX extends Application {
+
+    @Override
+    public void start(Stage stage) {
+        String javaVersion = System.getProperty("java.version");
+        String javafxVersion = System.getProperty("javafx.version");
+        Label l = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
+        Scene scene = new Scene(new StackPane(l), 640, 480);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch();
+    }
+
+}
+#+end_src
+
+
+lisp 目前跑是失敗的
+#+begin_src lisp javafx_Hello.lisp
+(require :abcl-contrib)
+(require :jss)
+
+(defconstant +javafx-based-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.base.jar")
+(defconstant +javafx-controls-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.controls.jar")
+(defconstant +javafx-graphics-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.graphics.jar")
+
+(add-to-classpath `(,+javafx-controls-path+ ,+javafx-based-path+ ,+javafx-graphics-path+))
+
+(defconstant +application+ (jclass "javafx.application.Application"))
+(defconstant +scene+ (jclass "javafx.scene.Scene"))
+(defconstant +label+ (jclass "javafx.scene.control.Label"))
+(defconstant +StackPane+ (jclass "javafx.scene.layout.StackPane"))
+(defconstant +stage+ (jclass "javafx.stage.Stage"))
+
+(defvar *tmp*)
+
+(let* ((HelloFX (jnew-runtime-class "HelloFX"
+                                    :superclass "javafx.application.Application"
+                                    :methods `(("main" :void ()
+                                                       (lambda (this)
+                                                         (jcall "launch" this)))
+                                               ("start" :void ("javafx.stage.Stage")
+                                                        (lambda (this (stage +stage+))
+                                                          (prog ((java-version "Example")
+                                                                 (javafx-version "Example")
+                                                                 (l (jnew +label+ (format nil "Hello, JavaFX ~A , running on Java ~A." javafx-version java-version)))
+                                                                 (scene (jnew +scene+ (jnew +stackpane+ 1) 640 480)))
+                                                             (jcall "setScene" stage scene)
+                                                             (jcall "show" stage)))))
+                                    :access-flags '(:public)))
+       (app (jnew HelloFX)))
+  (jcall "raunch" app ))
+#+end_src
