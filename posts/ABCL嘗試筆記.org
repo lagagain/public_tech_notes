@@ -123,39 +123,91 @@ public class HelloFX extends Application {
 #+end_src
 
 
-lisp 目前跑是失敗的
+不知道為什麼`javafx.scene.control`裡的物件類別回傳的是 nil
 #+begin_src lisp javafx_Hello.lisp
-(require :abcl-contrib)
-(require :jss)
+  (require :abcl-contrib)
+  (require :jss)
 
-(defconstant +javafx-based-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.base.jar")
-(defconstant +javafx-controls-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.controls.jar")
-(defconstant +javafx-graphics-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.graphics.jar")
+  (defconstant +javafx-based-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.base.jar")
+  (defconstant +javafx-controls-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.controls.jar")
+  (defconstant +javafx-graphics-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.graphics.jar")
+  (defconstant +javafx-fxml-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.fxml.jar")
+  (defconstant +javafx-media-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.media.jar")
+  (defconstant +javafx-properties-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.properties.jar")
+  (defconstant +javafx-swing-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.swing.jar")
+  (defconstant +javafx-swt-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx-swt.jar")
+  (defconstant +javafx-web-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.web.jar")
 
-(add-to-classpath `(,+javafx-controls-path+ ,+javafx-based-path+ ,+javafx-graphics-path+))
+  (add-to-classpath `(,+javafx-controls-path+
+                      ,+javafx-based-path+
+                      ,+javafx-graphics-path+
+                      ,+javafx-fxml-path+
+                      ,+javafx-media-path+
+                      ,+javafx-swing-path+
+                      ,+javafx-swt-path+
+                      ,+javafx-web-path+))
 
-(defconstant +application+ (jclass "javafx.application.Application"))
-(defconstant +scene+ (jclass "javafx.scene.Scene"))
-(defconstant +label+ (jclass "javafx.scene.control.Label"))
-(defconstant +StackPane+ (jclass "javafx.scene.layout.StackPane"))
-(defconstant +stage+ (jclass "javafx.stage.Stage"))
+  (defconstant +application+ (jclass "javafx.application.Application"))
+  (defconstant +scene+ (jclass "javafx.scene.Scene"))
+  (defconstant +label+ (jclass "javafx.scene.control.Label"))
+  (defconstant +StackPane+ (jclass "javafx.scene.layout.StackPane"))
+  (defconstant +stage+ (jclass "javafx.stage.Stage"))
+  (defconstant +group+ (jclass "javafx.scene.Group"))
 
-(defvar *tmp*)
+  (defvar *tmp*)
 
-(let* ((HelloFX (jnew-runtime-class "HelloFX"
-                                    :superclass "javafx.application.Application"
-                                    :methods `(("main" :void ()
-                                                       (lambda (this)
-                                                         (jcall "launch" this)))
-                                               ("start" :void ("javafx.stage.Stage")
-                                                        (lambda (this (stage +stage+))
-                                                          (prog ((java-version "Example")
-                                                                 (javafx-version "Example")
-                                                                 (l (jnew +label+ (format nil "Hello, JavaFX ~A , running on Java ~A." javafx-version java-version)))
-                                                                 (scene (jnew +scene+ (jnew +stackpane+ 1) 640 480)))
-                                                             (jcall "setScene" stage scene)
-                                                             (jcall "show" stage)))))
-                                    :access-flags '(:public)))
-       (app (jnew HelloFX)))
-  (jcall "raunch" app ))
+  (let* ((HelloFX (jnew-runtime-class "HelloFX"
+                                      :superclass "javafx.application.Application"
+                                      :methods `(("main" :void ()
+                                                         (lambda (this)
+                                                           (jcall "launch" this)))
+                                                 ("start" :void ("javafx.stage.Stage")
+                                                          (lambda (this stage)
+                                                            (prog* ((java-version "Example")
+                                                                   (javafx-version "Example")
+                                                                   ;(l (jnew +label+ (format nil "Hello, JavaFX ~A , running on Java ~A." javafx-version java-version)))
+                                          ;(scene (jnew +scene+ (jnew +stackpane+ 1) 640 480))
+                                                                   (root (jnew +group+))
+                                                                   (scene (jnew +scene+ root 300 300)))
+                                                               (jcall "setScene" stage scene)
+                                                               (jcall "show" stage)))))
+                                      :access-flags '(:public))))
+    (jstatic "launch" +application+ HelloFX (jnew-array "java.lang.String" 1)))
+
+  ;; (jstatic "launch" +application+ 'string)
+  ;; (jstatic "getUserAgentStylesheet" (jclass +application+))
+  ;; (jmethod +application+ "getUserAgentStylesheet")
+  (require :abcl-contrib)
+  (require :jss)
+
+  (defconstant +javafx-based-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.base.jar")
+  (defconstant +javafx-controls-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.controls.jar")
+  (defconstant +javafx-graphics-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.graphics.jar")
+
+  (add-to-classpath `(,+javafx-controls-path+ ,+javafx-based-path+ ,+javafx-graphics-path+))
+
+  (defconstant +application+ (jclass "javafx.application.Application"))
+  (defconstant +scene+ (jclass "javafx.scene.Scene"))
+  (defconstant +label+ (jclass "javafx.scene.control.Label"))
+  (defconstant +StackPane+ (jclass "javafx.scene.layout.StackPane"))
+  (defconstant +stage+ (jclass "javafx.stage.Stage"))
+
+  (defvar *tmp*)
+
+  (let* ((HelloFX (jnew-runtime-class "HelloFX"
+                                      :superclass "javafx.application.Application"
+                                      :methods `(("main" :void ()
+                                                         (lambda (this)
+                                                           (jcall "launch" this)))
+                                                 ("start" :void ("javafx.stage.Stage")
+                                                          (lambda (this (stage +stage+))
+                                                            (prog ((java-version "Example")
+                                                                   (javafx-version "Example")
+                                                                   (l (jnew +label+ (format nil "Hello, JavaFX ~A , running on Java ~A." javafx-version java-version)))
+                                                                   (scene (jnew +scene+ (jnew +stackpane+ 1) 640 480)))
+                                                               (jcall "setScene" stage scene)
+                                                               (jcall "show" stage)))))
+                                      :access-flags '(:public)))
+         (app (jnew HelloFX)))
+    (jcall "raunch" app ))
 #+end_src
