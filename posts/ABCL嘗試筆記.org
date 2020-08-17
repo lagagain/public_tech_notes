@@ -127,6 +127,120 @@ public class HelloFX extends Application {
 #+begin_src lisp javafx_Hello.lisp
   (require :abcl-contrib)
   (require :jss)
+  ;; (require :jna)
+
+  (jstatic "getProperty" "java.lang.System" "java.library.path")
+  ;; (jstatic "setProperty" "java.lang.System" "java.library.path" (namestring (first (uiop:directory* "./lib/"))))
+
+
+  ;; add classpath
+  (let (libs)
+    (setf libs
+          ;; (make-pathname :name :wild :directory '(:relative "lib") :type "jar")
+          (loop for file in (directory "lib/*.jar")
+                do
+                   (setf file (namestring file))
+                   (print file)
+                collect file))
+    (add-to-classpath libs))
+
+  ;; load dll
+  ;; note: some library can't load
+  ;;
+  ;; (let ((*standard-output* *standard-output*))
+  ;;   (loop for file in (uiop:directory-files "lib/")
+  ;;         do
+  ;;            (setf file (namestring file))
+  ;;         when (jstatic "matches" "java.util.regex.Pattern" ".*\\.so" file)
+  ;;           do
+  ;;              (restart-case (progn
+  ;;                              (format t "load ~A~%" (file-namestring file))
+  ;;                              (jstatic "load" (jclass "java.lang.System") file)
+  ;;                              (format t "~&Success~%"))
+  ;;                (continue nil
+  ;;                  (continue))
+  ;;                (stop nil
+  ;;                  (return)))))
+
+  (let ((*standard-output* *standard-output*))
+    (loop for file in (directory "lib/*.so")
+          do
+             (tagbody
+                (setf file (file-namestring file))
+                (setf file (subseq file 3 (- (length file) 3)))
+              load-library
+                (restart-case (progn
+                                (format t "load ~A~%" file)
+                                (jstatic "loadLibrary" (jclass "java.lang.System") file)
+                                (format t "~&Success~%"))
+                  (continue nil
+                    (continue))
+                  (try-again nil
+                    (go load-library))
+                  (try-load-other-file (new-file)
+                    :interactive (lambda nil (format t "Input Other name: ")
+                                   (list (read-line)))
+                    (setf file new-file)
+                    (go load-library))
+                  (set-new-search-path (path)
+                    :report "Set New Search Path"
+                    :interactive (lambda nil (format t "Input New Search Path: ")
+                                   (list (read-line)))
+                    (format t "New search path is: ~A~%" path)
+                    (jstatic "setProperty" "java.lang.System" "java.library.path" path))
+                  (stop nil
+                    (return)))))
+
+
+  (jclass "javafx.scene.control.Label")
+
+
+
+  (defconstant +application+ (jclass "javafx.application.Application"))
+  (defconstant +scene+ (jclass "javafx.scene.Scene"))
+  (defconstant +label+ (jclass "javafx.scene.control.Label"))
+  (defconstant +StackPane+ (jclass "javafx.scene.layout.StackPane"))
+  (defconstant +stage+ (jclass "javafx.stage.Stage"))
+  (defconstant +group+ (jclass "javafx.scene.Group"))
+
+
+
+  (let* ((HelloFX (jnew-runtime-class "HelloFX"
+                                      :superclass "javafx.application.Application"
+                                      :methods `(("main" :void ()
+                                                         (lambda (this)
+                                                           (jcall "launch" this)))
+                                                 ("start" :void ("javafx.stage.Stage")
+                                                          (lambda (this stage)
+                                                            (prog* ((java-version "Example")
+                                                                    (javafx-version "Example")
+                                          ;(l (jnew +label+ (format nil "Hello, JavaFX ~A , running on Java ~A." javafx-version java-version)))
+                                          ;(scene (jnew +scene+ (jnew +stackpane+ 1) 640 480))
+                                                                    (root (jnew +group+))
+                                                                    (scene (jnew +scene+ root 300 300)))
+                                                               (jcall "setScene" stage scene)
+                                                               (jcall "show" stage)))))
+                                      :access-flags '(:public))))
+    (jstatic "launch" +application+ HelloFX (jnew-array "java.lang.String" 1)))
+
+  (let* ((HelloFX (jnew-runtime-class "HelloFX"
+                                      :superclass "javafx.application.Application"
+                                      :methods `(("main" :void ()
+                                                         (lambda (this)
+                                                           (jcall "launch" this)))
+                                                 ("start" :void ("javafx.stage.Stage")
+                                                          (lambda (this (stage +stage+))
+                                                            (prog ((java-version "Example")
+                                                                   (javafx-version "Example")
+                                                                   (l (jnew +label+ (format nil "Hello, JavaFX ~A , running on Java ~A." javafx-version java-version)))
+                                                                   (scene (jnew +scene+ (jnew +stackpane+ 1) 640 480)))
+                                                               (jcall "setScene" stage scene)
+                                                               (jcall "show" stage)))))
+                                      :access-flags '(:public)))
+         (app (jnew HelloFX)))
+    (jcall "raunch" app ))
+  (require :abcl-contrib)
+  (require :jss)
 
   (defconstant +javafx-based-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.base.jar")
   (defconstant +javafx-controls-path+ "/home/john/coding/Java/classes/javafx-sdk-11.0.2/lib/javafx.controls.jar")
