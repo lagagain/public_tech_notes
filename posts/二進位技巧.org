@@ -1,0 +1,90 @@
+
+** 如果數字n是二進位表示01相間的數字 
+
+*** ~a = n + (n >> 1)~ 是全1的數字
+ #+begin_src python :results output :exports both :session zeroone
+   n = 0b0101010101
+   a = n + (n >> 1)
+   print("{:d}({:b}), {:d}({:b})".format(n, n, a, a))
+ #+end_src
+
+ #+RESULTS:
+ : 341(101010101), 511(111111111)
+
+*** ~b = a & (a + 1)~ 是全0的數字
+#+begin_src python :results output :exports both :session zeroone
+  b = a & (a + 1)
+  print("{:d}({:b}), {:d}({:b})".format(a, a, b, b))
+#+end_src
+
+#+RESULTS:
+: 511(111111111), 0(0)
+
+** 判斷 ~n~ 是否為2的次冪的最快方式
+如果數字n是2的次冪，那麼它的二進位表示只有一位是1，其餘位都是0，那麼  ~n&(n-1)=0~  。
+
+** 求一個數的二進位表達中1的個數
+假如x是一個二進數，例如 ~x=0xfffa（1111 1111 1111 1010）~ ，要實現去掉最低位一個1，可進行的操作是 ~x&=(x-1)~ ，此時 ~x==0xfff8（1111 1111 1111 1000）~ 。基於該思想，利用while循環對(x)判斷，可實現計算二進位數中所有位上1的個數。
+
+#+begin_src python :var x=9 :results output :exports both
+  cnt = 0
+  _x = x
+  while x:
+      cnt += 1
+      x &= (x - 1)
+
+  print(f"{_x:d}({_x:b}): {cnt}")
+#+end_src
+
+#+RESULTS:
+: 9(1001): 2
+
+** 求一個數的二進位表達中0的個數
+
+假如x是一個二進數，例如 ~x=0xfffa(1111 1111 1111 1010)~ ，要實現去掉最低位一個0，可進行的操作是 ~x|=(x+1)~ ，此時 ~x==0xfffb(1111 1111 1111 1011)~ ；再去掉一個0，同樣， ~x|=(x+1)~ ，則 ~x==0xffff~ 。如果 ~x~ 的2字節表示，則 ~(x+1)~ 為0。基於該思想，利用 ~wile~ 循環對 ~(x+1)~ 判斷，可實現計算二進位數中所有位上0的個數。注意， ~x=1~ 時， ~1~ 的高位默認有 ~0~ 的（注意是所有位而不是寫出來的位上，因為二進位高位的0是默認不寫出來的，但是不寫出來不代表沒有啊）。
+
+#+begin_src python :var x=65530 :results output :exports both
+  cnt = 0
+  _x = x
+  base = 16
+  while (x+1)&(2**base - 1):
+      cnt += 1
+      x |= (x + 1)
+      x &= (2**base - 1)
+  print(f"{_x:d}({_x:b}): {cnt}")
+#+end_src
+
+#+RESULTS:
+: 65530(1111111111111010): 2
+
+
+**  異或的特徵，相同的數字異或為0,0異或任何數字都是任何數字。可以利用異或來找到數組中只出現過一次的元素。
+** 不使用其他空間，交換兩個值，32就是97和65的異或值（大小寫字母ASCII碼之間的異或值）
+
+#+begin_src python :exports both :results output
+print(ord('a') - ord('A'))
+print(ord('a') ^ ord('A'))
+#+end_src
+
+#+RESULTS:
+: 32
+: 32
+
+** 使用ASCII碼和異或的性質，實現大小寫的相互轉換：s[index]^=(1<<5)
+
+#+begin_src python :exports both :results output :var c="a"
+print(1<<5) #=> 32
+print(c, end=" => ")
+ascii_code = ord(c)
+ascii_code ^= (1 << 5)
+c = chr(ascii_code)
+print(c)
+#+end_src
+
+#+RESULTS:
+: 32
+: a => A
+
+** C++中，A–65,a–97,異或表示不考慮進位的加法65^32=97,97^32=65（轉換大小寫用這種寫法，簡直震驚了）
+* 參考資料
+- https://kknews.cc/zh-tw/code/vvlnvla.html
