@@ -1,0 +1,49 @@
+
+
+#+begin_src lisp :results output :tangle test.lisp
+  (defparameter *x* 1)
+
+  (defun f ()
+                                          ;(declare (special *x*))
+    (format t "~&~A~%" *x*))
+
+
+  (f)
+
+  (let (( *x* 2))
+    (f))
+
+  (defun substitute-deep (new old el)
+    (typecase el
+      (atom (if (eq el old)
+                new
+                el))
+      (list (loop for e in el
+                  collect
+                  (substitute-deep new old e)))
+      (nil nil)
+      (t el)))
+
+  (defmacro deflexer (s v &body body)
+    (let ((_s (gensym)))
+      (setf body (substitute-deep _s s body))
+      `(let ((,_s ,v))
+         ,@body)))
+
+  (format t "~&~S~%" (macroexpand-1 '(deflexer *x* 6
+                                  (format t "lexer *x* is ~A~&" *x*)
+                                  (f))))
+
+  (deflexer *x* 6
+    (format t "lexer *x* is ~A~&" *x*)
+    (f))
+#+end_src
+
+#+RESULTS:
+: 1
+: 2
+: (LET ((#:G546 6))
+:   (FORMAT T "lexer *x* is ~A~&" #:G546)
+:   (F))
+: lexer *x* is 6
+: 1

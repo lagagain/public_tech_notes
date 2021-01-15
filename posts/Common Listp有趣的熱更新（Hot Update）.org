@@ -88,9 +88,15 @@ echo "HELLO"
       print(name)
 
   def hello_time(times):
+      global hello
       for i in range(times):
           hello(i)
           time.sleep(1)
+          if i % 2 == 0:
+              hello = lambda name: print(name)
+          else:
+              hello = lambda name: print("hello", name)
+
   t1 = threading.Thread(target=hello_time, args=[10])
   t1.run()
 
