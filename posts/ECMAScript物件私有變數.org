@@ -1,0 +1,232 @@
+
+* 前言
+物件私有變數是在[[https://github.com/tc39/proposal-class-fields][ES2020實驗草案]]被提出。用於簡易實現 private field 的行為。這是讓我有點興奮的功能，還記得在去年寫的[[https://www.coderbridge.com/series/bef169fb20024cafb8cdb32d5b2a0d3d/posts/2c01145789214377b63b5271ba7b4be9][7天搞懂JS進階議題-番外篇]]，曾經利用 Closure 實現 Private 的能力。但其實該實現有不少限制，或是實現上有些麻煩。今天就想了解看看這像新特性到什麼程度。
+
+#+begin_quote
+嘗試後，認為其實也就只是語法糖。完全可以手工實現，只是手工麻煩些。
+#+end_quote
+
+不同於 TypeScript 的 private，只是在編譯期做檢查。這項能力更接近於運行時期的保護。某種程度上我認為會更安全。
+
+* 現況
+  這項特性的實現目前並不算普及，甚至有點悲劇...
+  [[https://i.ibb.co/CQTDpJw/image.png]]
+
+  我目前使用的 Firefox browser v84 並不支援，嘗試了一下 node.js v10 也不行，但 node.js v12 之後可以，但是嘗試後並不完全。node.js 要完整使用，可能要使用 14 以後的版本。
+
+* 測試環境
+#+begin_src shell :exports both
+node --version
+#+end_src
+
+#+RESULTS:
+: v14.15.4
+
+
+* 語法基礎
+  語法上非常簡單，只要變數名稱開頭為`#`就可以，同樣也可以設為 const、static 等類型。所以我們先建立一個簡單的類別：
+
+  #+name: define_C_class
+  #+begin_src js :exports both :results none
+    // define C class
+    class C {
+      static #s = 'private static field'
+      #p
+
+      static getS(){
+        return C.#s;
+      }
+
+      static #PrivateStatic(){
+        console.log(`Private Staic Method`);
+      }
+
+      static PublicStatic(){
+        C.#PrivateStatic();
+      }
+
+      constructor(){
+        this.#p = 'private field'
+      }
+
+      getP(){
+        return this.#p
+      }
+
+      setP(value){
+        this.#p = value
+        return this.#p
+      }
+
+      #PrivateMethod(){
+        console.log(`Private Method`);
+      }
+
+      PublicMethod(){
+        this.#PrivateMethod();
+      }
+    }
+
+  #+end_src
+
+
+** 嘗試存取靜態私有屬性
+
+  #+begin_src js :exports both :results output :noweb yes
+    <<define_C_class>>
+      // try to access private static field
+
+    try {
+      eval(`
+        try {
+          console.log(C.#s); // error
+        } catch {
+          console.log("Can't find C.#s");
+        }
+    `)
+    } catch (e){
+      console.log(e)
+    }
+  #+end_src
+
+  #+RESULTS:
+  : SyntaxError: Private field '#s' must be declared in an enclosing class
+  :     at Object.<anonymous> (/tmp/babel-dZaIdK/js-script-WTqGUL:43:3)
+  :     at Module._compile (internal/modules/cjs/loader.js:1063:30)
+  :     at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+  :     at Module.load (internal/modules/cjs/loader.js:928:32)
+  :     at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+  :     at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+  :     at internal/main/run_main_module.js:17:47
+
+  透過公開方法
+  #+begin_src js :exports both :results output :noweb yes
+    <<define_C_class>>
+    // with public method
+    console.log(`C.#s is `, C.getS()); // => 'private static field'
+  #+end_src
+
+  #+RESULTS:
+  : C.#s is  private static field
+
+** 呼叫私有靜態方法
+
+  #+begin_src js :exports both :results output :noweb yes
+<<define_C_class>>
+    // try to call private statice method
+
+    try{
+      eval(`try {
+        C.#PrivateStatic(); // error
+      } catch {
+        console.log("Can't use C.#PrivateStatic");
+      }`)
+    } catch(e) {
+      console.log(e)
+    }
+
+  #+end_src
+
+  #+RESULTS:
+  : SyntaxError: Private field '#PrivateStatic' must be declared in an enclosing class
+  :     at Object.<anonymous> (/tmp/babel-dZaIdK/js-script-szJVvb:43:7)
+  :     at Module._compile (internal/modules/cjs/loader.js:1063:30)
+  :     at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+  :     at Module.load (internal/modules/cjs/loader.js:928:32)
+  :     at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+  :     at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+  :     at internal/main/run_main_module.js:17:47
+
+  透過公開方法
+
+  #+begin_src js :exports both :results output :noweb yes
+    <<define_C_class>>
+      // with public method
+    C.PublicStatic(); // => `Private Staic Method`
+  #+end_src
+
+  #+RESULTS:
+  : Private Staic Method
+
+  
+** 建立物件
+   #+name: create_a_obj
+     #+begin_src js :exports both :results none :noweb yes
+       <<define_C_class>>
+       // create a instance of C
+       var obj = new C()
+   #+end_src
+
+** 存取私有屬性
+
+   #+begin_src js :exports both :results output :noweb yes
+       <<create_a_obj>>
+
+     try{
+       eval(`// try to access private field p
+         try {
+           console.log(obj.#p); // error
+         } catch {
+           console.log("Can't find obj.#p");
+         }
+         console.log("obj.#p is", obj.getP());
+     `)
+     } catch (e) {
+       console.log(e)
+     }
+   #+end_src
+
+   #+RESULTS:
+   : SyntaxError: Private field '#p' must be declared in an enclosing class
+   :     at Object.<anonymous> (/tmp/babel-dZaIdK/js-script-wUXaAF:42:3)
+   :     at Module._compile (internal/modules/cjs/loader.js:1063:30)
+   :     at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+   :     at Module.load (internal/modules/cjs/loader.js:928:32)
+   :     at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+   :     at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+   :     at internal/main/run_main_module.js:17:47
+
+   透過公開方法
+   #+begin_src js :exports both :results output :noweb yes
+     <<create_a_obj>>
+      console.log(`obj.#p is`, obj.getP());
+   #+end_src
+
+   #+RESULTS:
+   : obj.#p is private field
+
+   
+** 呼叫私有方法
+   #+begin_src js :exports both :results output :noweb yes
+      <<create_a_obj>>
+     // try to call private method
+     try {
+       eval(`C.#PrivateStatic(); // error`)
+     } catch(e) {
+       console.log(e);
+     }
+   #+end_src
+
+   #+RESULTS:
+   : SyntaxError: Private field '#PrivateStatic' must be declared in an enclosing class
+   :     at Object.<anonymous> (/tmp/babel-dZaIdK/js-script-sJOAPG:44:3)
+   :     at Module._compile (internal/modules/cjs/loader.js:1063:30)
+   :     at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+   :     at Module.load (internal/modules/cjs/loader.js:928:32)
+   :     at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+   :     at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+   :     at internal/main/run_main_module.js:17:47
+
+   透過公開方法
+   #+begin_src js :exports both :results output :noweb yes
+     <<create_a_obj>>
+    // with public method
+    obj.PublicMethod(); // => `Private Staic Method`
+   #+end_src
+
+   #+RESULTS:
+   : Private Method
+   
+* 參考資料
+
+  - [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields][[MDN] Private class fields]]
