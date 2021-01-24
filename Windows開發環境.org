@@ -1,0 +1,23 @@
+
+* 允許執行 PowerShell Script
+  https://docs.microsoft.com/zh-tw/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.1
+  
+* Oh my Posh
+  https://ohmyposh.dev/
+
+  
+* MobaXterm
+  https://mobaxterm.mobatek.net/
+
+  
+* Windows Terminal
+  https://www.microsoft.com/zh-tw/p/windows-terminal/9n0dx20hk701?activetab=pivot:overviewtab
+
+  
+** Alternative
+   - cmder
+   - hyper
+* Windows Subsystem for Linux(WSL)
+  https://docs.microsoft.com/zh-tw/windows/wsl/install-win10
+* workspacer
+  https://workspacer.org/
