@@ -1,0 +1,61 @@
+* C 語言
+
+  #+begin_src c :results output :exports both
+    #include<stdio.h>
+    #include<stdlib.h>
+
+    int main(void){
+      int i = 0;
+
+      printf("output: %d\n", i);
+
+      do {
+        int i = i;
+        printf("innter %d\n", i);
+        i = 1;
+        printf("innter %d\n", i);
+      } while(0);
+
+      printf("output: %d\n", i);
+
+      return 0;
+    }
+  #+end_src
+
+  #+begin_quote
+output: 0
+innter 0
+innter 1
+output: 0
+  #+end_quote
+
+  
+* Common Lisp
+
+  #+begin_src common-lisp :results output :exports both
+    (let ((i 0))
+      (format t "outer i: ~D~%" i)
+      (let ((i i))
+        (format t "inner i: ~D~%" i)
+        (incf i)
+        (format t "inner i: ~D~%" i))
+      (format t "outer i: ~D~%" i))
+  #+end_src
+
+
+  #+begin_quote
+outer i: 0
+inner i: 0
+inner i: 1
+outer i: 0
+  #+end_quote
+
+
+  
+* ECMAScript
+
+  受 let 語法限制，難以做到。
+
+  
+* Python
+  沒有區域變數，難以做到。
