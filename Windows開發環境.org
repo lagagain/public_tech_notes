@@ -1,6 +1,9 @@
 
 * 允許執行 PowerShell Script
   https://docs.microsoft.com/zh-tw/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.1
+
+* Auto Complete
+  https://dev.to/ofhouse/add-a-bash-like-autocomplete-to-your-powershell-4257
   
 * Oh my Posh
   https://ohmyposh.dev/
@@ -19,5 +22,11 @@
    - hyper
 * Windows Subsystem for Linux(WSL)
   https://docs.microsoft.com/zh-tw/windows/wsl/install-win10
+** 輸入法
+   - https://patrickwu.space/2019/10/28/wsl-fcitx-setup/
+   - https://patrickwu.space/2019/10/28/wsl-fcitx-setup-cn/
+
+** 允許其他電腦連線
+   https://www.nextofwindows.com/allow-server-running-inside-wsl-to-be-accessible-outside-windows-10-host
 * workspacer
   https://workspacer.org/

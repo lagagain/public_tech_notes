@@ -1,0 +1,347 @@
+
+* Python
+  不支持 應該會報錯
+#+begin_src python
+  def callme(i):
+      if i < 0: return i
+      print(i)
+      return callme(i+1)
+
+  callme(1)
+#+end_src
+
+
+* JavaScript / ECMAScript
+  不支持(Node.js v14.15.4 / deno v0.34)
+  Chrome / Firefox 不支持。
+
+  #+begin_src javascript
+    'use strict';
+
+    function callme(i) {
+      if (i < 0) return i
+      console.log(i)
+      return callme(++i)
+    }
+
+
+    callme(1)
+  #+end_src
+
+* Lua
+  支持
+
+  #+begin_src lua
+function callme(i)
+    if i < 0 then return i end
+    print(i)
+    return callme(i+1)
+end
+
+callme(1)
+  #+end_src
+
+
+
+  
+* Common Lisp
+  Hyperspec 未強制要求。主流多數已經完全支持，一些少部分支持，但是 abcl 不支持。
+
+  #+begin_src common-lisp
+    (defun callme (i)
+      (when (< i 0) (return-from callme i))
+      (format t "~A~%" i)
+      (callme (incf i)))
+
+    (callme 1)
+  #+end_src
+
+
+  ABCL 的可行版本
+  
+  #+begin_src common-lisp
+    (defun callme (i)
+      (tagbody
+       start
+         (labels ((callme (_i)
+                    (progn (setf i _i)
+                           (go start))))
+           (when (< i 0) (return-from callme i))
+           (format t "~A~%" i)
+           (callme (incf i)))))
+
+    (callme 1)
+
+    ;; or
+
+
+    (defun callme (i)
+      (tagbody
+       start
+         (macrolet ((callme (_i)
+                      `(progn (setf i ,_i)
+                              (go start))))
+           (when (< i 0) (return-from callme i))
+           (format t "~A~%" i)
+           (callme (incf i)))))
+
+    (callme 1)
+  #+end_src
+
+  透過 macro 可以做得更多：
+  #+begin_src lisp
+    (defmacro TCO ((_defun fun-name args-form &body body))
+      (let ((start-label (gensym))
+            (new-body '()))
+        (labels ((check-and-replace-or-return (form)
+                   (cond ((and (listp form)
+                               (eq (first form) 'return)
+                               (let ((form (second form)))
+                                 (and (listp form)
+                                      (eq (first form) fun-name))))
+                          (let* ((new-args (cdadr form))
+                                 (set-form (loop for sym in args-form
+                                                 for val in new-args
+                                                 collect `(setf ,sym ,val))))
+                            (assert (= (length args-form)
+                                       (length new-args))
+                                    (new-args)
+                                    "Must have same args length")
+                            `(progn
+                               ,@set-form
+                              (go ,start-label))))
+                         ((listp form) (loop for f in form collect (check-and-replace-or-return f)))
+                         (t form))))
+          (dolist (form body new-body)
+            ;; (print form)
+            ;; (print (check-and-replace-or-return form))
+            (setf new-body (append new-body (list (check-and-replace-or-return form)))))
+          (assert (eq _defun 'defun) (_defun) "Must defun form")
+          (assert (symbolp fun-name) (fun-name) "fun-name must be symbol")
+          (assert (listp args-form) (args-form) "args must be form")
+          ;; (print "-----------hello--------------")
+          ;; (print new-body)
+          ;; (print "-----------hello--------------")
+          `(,_defun ,fun-name ,args-form
+             (tagbody
+                ,start-label
+                ,@new-body)))))
+
+    (TCO
+     (defun callme (i)
+       (when (< i 0) (return i))
+       (format t "~A~%" i)
+       (return (callme (incf i)))))
+
+    (callme 1)
+  #+end_src
+
+  來看看 SBCL 做了什麼事情
+
+    #+begin_src common-lisp
+      (defun callme (i)
+        (when (< i 0) (return-from callme i))
+        (format t "~A~%" i)
+        (callme (incf i)))
+
+      (disassemble #'callme)
+  #+end_src
+
+  #+begin_quote
+  ; disassembly for CALLME
+; Size: 156 bytes. **Origin: #x100193A185**
+; **185**:       498B4D60         MOV RCX, [R13+96]               ; no-arg-parsing entry point
+                                                              ; thread.binding-stack-pointer
+; 189:       48894DF8         MOV [RBP-8], RCX
+; 18D:       488B55F0         MOV RDX, [RBP-16]
+; 191:       31FF             XOR EDI, EDI
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 193:       FF1425C800B021   CALL QWORD PTR [#x21B000C8]     ; GENERIC-<
+; 19A:       7C79             JL L0                           ; (when (< i 0) (return-from callme i)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 這一大段在(format t "~A~%" i)
+; 19C:       488B55F0         MOV RDX, [RBP-16]
+; 1A0:       498B8D20020000   MOV RCX, [R13+544]              ; tls: *STANDARD-OUTPUT*
+; 1A7:       83F961           CMP ECX, 97
+; 1AA:       480F440C25D8B54A20 CMOVEQ RCX, [#x204AB5D8]      ; *STANDARD-OUTPUT*
+; 1B3:       488BF1           MOV RSI, RCX
+; 1B6:       488975E8         MOV [RBP-24], RSI
+; 1BA:       4883EC10         SUB RSP, 16
+; 1BE:       488BFE           MOV RDI, RSI
+; 1C1:       B904000000       MOV ECX, 4
+; 1C6:       48892C24         MOV [RSP], RBP
+; 1CA:       488BEC           MOV RBP, RSP
+; 1CD:       B8F8A43120       MOV EAX, #x2031A4F8             ; #<FDEFN PRINC>
+; 1D2:       FFD0             CALL RAX
+; 1D4:       488B75E8         MOV RSI, [RBP-24]
+; 1D8:       4883EC10         SUB RSP, 16
+; 1DC:       488BD6           MOV RDX, RSI
+; 1DF:       B902000000       MOV ECX, 2
+; 1E4:       48892C24         MOV [RSP], RBP
+; 1E8:       488BEC           MOV RBP, RSP
+; 1EB:       B878103220       MOV EAX, #x20321078             ; #<FDEFN TERPRI>
+; 1F0:       FFD0             CALL RAX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (incf i)
+; 1F2:       488B55F0         MOV RDX, [RBP-16]
+; 1F6:       BF02000000       MOV EDI, 2
+; 1FB:       FF1425A800B021   CALL QWORD PTR [#x21B000A8]     ; GENERIC-+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 202:       488955F0         MOV [RBP-16], RDX
+; 206:       B902000000       MOV ECX, 2
+; 20B:       FF7508           PUSH QWORD PTR [RBP+8]
+; 20E:       B8F86D5020       MOV EAX, #x20506DF8             ; #<FDEFN CALLME>
+; 213:       FFE0             JMP RAX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 215: L0:   488B55F0         MOV RDX, [RBP-16]
+; 219:       488BE5           MOV RSP, RBP
+; 21C:       F8               CLC
+; 21D:       5D               POP RBP
+; 21E:       C3               RET
+; 21F:       CC0F             BREAK 15                        ; Invalid argument count trap
+  #+end_quote
+
+
+這裡會需要注意的只有：
+- callme 存在於#x100193A185
+- 202-213 這段
+
+可以看到 213 最後是做了跳轉(JMP)，而非呼叫(CALL)，也沒有去調整堆疊空間(ESP)。對，只是做了簡單的跳轉，而未使用多餘的堆疊空鍵。
+
+顯在，只要確定跳轉到的位置，是 callme 的位置即可。我們需要知道 RAX 的值，而這個值與 EAX 有關(高低位)。先看看 EAX 二進位長怎樣：
+
+#+begin_src lisp :results output
+  (format t "~B~%" #x20506DF8)
+#+end_src
+
+#+RESULTS:
+:            0010 0000  0101 0000  0110 1101  1111 1000
+
+#+begin_src lisp :results output
+  (format t "~b~%" #x100193A185)
+#+end_src
+
+#+RESULTS:
+: 0001 0000  0000 0001  1001 0011  1010 0001  1000 0101
+
+阿勒？看來還是做了多餘的事情。再試圖簡化看看：
+
+      #+begin_src lisp :results output
+        (defun callme (i)
+          (declare (optimize (speed 3)
+                             (safety 0)
+                             (debug 0)
+                             (compile-speed 0))
+                   (type i fixnum))
+          (when (< i 0) (return-from callme i))
+          (format t "~A~%" i)
+          (callme (incf i)))
+
+        (disassemble #'callme)
+  #+end_src
+
+  #+RESULTS:
+  #+begin_example
+  ; disassembly for CALLME
+  ; Size: 153 bytes. Origin: #x100193C4D0
+  ; 4D0: L0:   488975F8         MOV [RBP-8], RSI                ; no-arg-parsing entry point
+  ; 4D4:       31FF             XOR EDI, EDI
+  ; 4D6:       488BD6           MOV RDX, RSI
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ; 4D9:       FF1425C800B021   CALL QWORD PTR [#x21B000C8]     ; GENERIC-<
+  ; 4E0:       488B75F8         MOV RSI, [RBP-8]
+  ; 4E4:       7C7A             JL L1
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; 這一大段在(format t "~A~%" i)
+  ; 4E6:       488BCE           MOV RCX, RSI
+  ; 4E9:       498B8520020000   MOV RAX, [R13+544]              ; tls: *STANDARD-OUTPUT*
+  ; 4F0:       83F861           CMP EAX, 97
+  ; 4F3:       480F440425D8B54A20 CMOVEQ RAX, [#x204AB5D8]      ; *STANDARD-OUTPUT*
+  ; 4FC:       488975F8         MOV [RBP-8], RSI
+  ; 500:       488945F0         MOV [RBP-16], RAX
+  ; 504:       4883EC10         SUB RSP, 16
+  ; 508:       488BD1           MOV RDX, RCX
+  ; 50B:       488BF8           MOV RDI, RAX
+  ; 50E:       B904000000       MOV ECX, 4
+  ; 513:       48892C24         MOV [RSP], RBP
+  ; 517:       488BEC           MOV RBP, RSP
+  ; 51A:       B8F8A43120       MOV EAX, #x2031A4F8             ; #<FDEFN PRINC>
+  ; 51F:       FFD0             CALL RAX
+  ; 521:       488B45F0         MOV RAX, [RBP-16]
+  ; 525:       4883EC10         SUB RSP, 16
+  ; 529:       488BD0           MOV RDX, RAX
+  ; 52C:       B902000000       MOV ECX, 2
+  ; 531:       48892C24         MOV [RSP], RBP
+  ; 535:       488BEC           MOV RBP, RSP
+  ; 538:       B878103220       MOV EAX, #x20321078             ; #<FDEFN TERPRI>
+  ; 53D:       FFD0             CALL RAX
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; (incf i)
+  ; 53F:       488B75F8         MOV RSI, [RBP-8]
+  ; 543:       BF02000000       MOV EDI, 2
+  ; 548:       488BD6           MOV RDX, RSI
+  ; 54B:       FF1425A800B021   CALL QWORD PTR [#x21B000A8]     ; GENERIC-+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ; 552:       488BC2           MOV RAX, RDX
+  ; 555:       488BF0           MOV RSI, RAX
+  ; 558:       488BF0           MOV RSI, RAX
+  ; 55B:       E970FFFFFF       JMP L0
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ; 560: L1:   488BD6           MOV RDX, RSI
+  ; 563:       488BE5           MOV RSP, RBP
+  ; 566:       F8               CLC
+  ; 567:       5D               POP RBP
+  ; 568:       C3               RET
+  #+end_example
+
+
+* Java
+
+  Java 11, 14 測試失敗
+  
+  #+begin_src java
+    class Main {
+        public static void main(String[] args){
+            callme(1);
+        }
+
+        static int callme(int i) {
+            if(i < 0) return i;
+            System.out.println(i);
+            return callme(i+1);
+        }
+    }
+  #+end_src
+  
+* Kotlin
+Fail
+  
+  #+begin_src kotlin
+
+fun main(args : Array<String>) {
+    callme(1);
+}
+
+fun callme(i: Int):Int{
+    if(i < 0) return i;
+    println(i);
+    return callme(i+1);
+}
+  #+end_src
+  
+* C#
+Fail
+  #+begin_src c#
+    using System;
+
+    class CallMe {
+      static void Main() {
+        callme(1);
+      }
+      static int callme(int i){
+        if(i < 0) return i;
+        Console.WriteLine(i);
+        return callme(i + 1);
+      }
+    }
+  #+end_src
