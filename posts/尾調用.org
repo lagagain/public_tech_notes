@@ -19,6 +19,7 @@
     'use strict';
 
     function callme(i) {
+    'use strict';
       if (i < 0) return i
       console.log(i)
       return callme(++i)
@@ -32,7 +33,7 @@
   支持
 
   #+begin_src lua
-function callme(i)
+　function callme(i)
     if i < 0 then return i end
     print(i)
     return callme(i+1)
@@ -123,9 +124,9 @@ callme(1)
           ;; (print new-body)
           ;; (print "-----------hello--------------")
           `(,_defun ,fun-name ,args-form
-             (tagbody
-                ,start-label
-                ,@new-body)))))
+                    (block nil (tagbody)
+                           ,start-label
+                           ,@new-body)))))
 
     (TCO
      (defun callme (i)
@@ -300,7 +301,7 @@ callme(1)
   Java 11, 14 測試失敗
   
   #+begin_src java
-    class Main {
+    class callme {
         public static void main(String[] args){
             callme(1);
         }
@@ -344,4 +345,50 @@ Fail
         return callme(i + 1);
       }
     }
+  #+end_src
+
+
+* C
+  #+begin_src c
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    typedef long long int LInt;
+
+    LInt callme(LInt i){
+      if (i < 0) return i;
+      printf("%d\n", i);
+      return callme(i);
+    }
+
+    int main(void){
+      callme(1);
+    }
+  #+end_src
+  
+* Ruby
+main.rb
+  #+begin_src ruby
+# main.rb
+RubyVM::InstructionSequence.compile_option = {
+  tailcall_optimization: true,
+  trace_instruction: false
+}
+
+require './callme.rb'
+
+(callme 1)
+
+#+end_src
+
+callme.rb
+#+begin_src ruby
+    def callme(i)
+      return i if i < 0
+      puts i
+      return callme i+1
+    end
+
+
+    callme(1)
   #+end_src
