@@ -392,3 +392,22 @@ callme.rb
 
     callme(1)
   #+end_src
+
+  
+* Go
+  
+* Rust
+
+
+  
+* Referance
+  - https://gist.github.com/lagagain/6b50954e5d088095dbd991a8b00163a0
+  - https://0branch.com/notes/tco-cl.html
+  - https://macropy3.readthedocs.io/en/latest/tco.html
+  - https://dev.to/seanchen1991/the-story-of-tail-call-optimizations-in-rust-35hf
+  - https://users.rust-lang.org/t/when-will-rust-have-tco-tce/20790
+
+
+** SWIG
+   - http://www.swig.org/Doc1.3/Ruby.html
+   - http://www.swig.org/Doc4.0/Python.html
