@@ -29,6 +29,52 @@
     callme(1)
   #+end_src
 
+  setTimeout 的解法：
+
+  #+begin_src javascript
+    function callme(i) {
+        if (i < 0) return i;
+        console.log(i);
+        return call(callme, i + 1);
+    }
+
+    call(callme, 1);
+
+
+    function call(fn, ...args) {
+        setTimeout(()=>(fn(...args)));
+    }
+  #+end_src
+
+  不完全等於，但相似：
+  
+  #+begin_src javascript
+    events = []
+
+    function callme(i) {
+      if (i < 0) return i;
+      console.log(i);
+      return call(callme, i + 1);
+    }
+
+
+    function call(fn, ...args) {
+      events.push(fn.bind(null, ...args));
+    }
+
+    events.empty = function(){
+      return this.length === 0;
+    }
+
+    while (!events.empty()) {
+      events.shift().call();
+    }
+
+    call(callme, 1);
+  #+end_src
+
+  其他可以參考 gist[ref:1]
+  
 * Lua
   支持
 
