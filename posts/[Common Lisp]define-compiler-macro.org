@@ -33,3 +33,212 @@
 : (ADD 1 2)
 : 7
 : (ADD A 2)
+
+
+#+begin_src lisp :results output :async
+  (unintern '
+  (unintern 'add12)
+  (define-compiler-macro add (&whole form a b)
+    (if (and (numberp a)
+             (numberp b))
+        (+ a b)
+        form))
+
+  (define-compiler-macro add12 ()
+    3)
+
+  (declaim (ftype (function (fixnum fixnum) fixnum) add))
+  (declaim (maybe-inline add))
+  (defun add (a b)
+    (declare (optimize (speed 3)
+                       (compilation-speed 0)
+                       (debug 0)
+                       (safety 0))
+             (type fixnum a b))
+    (the fixnum (+ a b))
+    (+ a b))
+
+  (declaim (ftype (function () fixnum) add12))
+  (declaim (maybe-inline add12))
+  (defun add12 ()
+    (declare (optimize (speed 3)
+                       (debug 0)
+                       (compilation-speed 0)
+                       (safety 0))
+             (ftype (function (fixnum fixnum) fixnum) add)
+             (inline add))
+    (add 1 2))
+
+  (compiled-function-p #'add12)
+  (compiled-function-p #'add)
+  (compile 'add12)
+
+  (disassemble #'add12)
+  (disassemble #'add)
+
+  (add12)
+  (add 1 2)
+
+  (locally (declare (optimize (speed 3)
+                              (debug 0)
+                              (safety 0)
+                              (compilation-speed 0)))
+    (format t "------ (add 1 2) -------")
+    (time (dotimes (_ 1000000000) (add 1 2)))
+    (format t "------ (add12) -------")
+    (time (dotimes (_ 1000000000) (add12))))
+
+  (funcall (compiler-macro-function 'add) '(add 1 2) nil)
+
+  ;;;;;;;;;;;;;;;;;;
+
+  (unintern 'my-sum)
+  (define-compiler-macro my-sum (&whole form
+                                        &key
+                                        (from 0)
+                                        (to 10))
+    ;; (declare (type fixnum from to))
+    (format t "~&Compile (my-sum :from ~D :to ~D)~&" from to)
+    (let ((result
+            (if (and (realp from)
+                     (realp to))
+                (loop for i from from to to sum i)
+                form)))
+      (format t "~&Compiled Finish (my-sum :from ~D :to ~D):~S~&" from to result)
+      result))
+
+  (defun my-sum (&key (from 0) (to 10))
+    (declare (type fixnum from to))
+    (loop for i from from to to sum i))
+
+  (defun macrolet-version nil
+      (symbol-macrolet ((asdfhahaha 1000) (times 5)
+                        (from 0)
+                        (to 1000000000))
+        (declare (type fixnum times from to))
+        (format t "------ (symbol-macorolet) my-sum ~D ~~ ~D with ~D times -----~&"
+                from to times)
+        (dotimes (_ times)
+          (format t "~A~%" (my-sum :from from :to to)))))
+
+  (defun let-version nil
+    (let ((times 5)
+          (from 0)
+          (to 1000000000))
+      (declare (type fixnum times from to))
+      (format t "------ (let) my-sum ~D ~~ ~D with ~D times -----~&"
+              from to times)
+      (dotimes (_ times)
+        (format t "~A~%" (my-sum :from from :to to)))))
+
+  (defun macro-optimize-version nil
+    (format t "------ (macro optimize) my-sum -----~&")
+    (symbol-macrolet ((times 5))
+      (macrolet ((mmy-sum (from to)
+                   (format t "------ (macro optimize) my-sum ~D ~~ ~D with ~D times -----~&"
+                           from to times)
+                   `(my-sum :from ,from :to ,to)))
+        (dotimes (_ times)
+          (format t "~A~%" (mmy-sum 0 1000000000))))))
+
+
+  (time (macrolet-version))
+  (time (let-version))
+  (time (macro-optimize-version))
+
+  (disassemble #'macrolet-version)
+  (disassemble #'let-version)
+  (disassemble #'macro-optimize-version)
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun v1 (from to &optional (times 5))
+    (format t "~&------- v1 -------~%")
+    (dotimes (_ times)
+      (format t "~A~%" (my-sum :from from :to to))))
+
+  (define-compiler-macro v2 (&whole form from to &optional (times 5))
+    (format t "~&Compile (v2 ~A ~A ~A)~%" from to times)
+    (let ((result
+            (if (and (realp from)
+                     (realp to)
+                     (realp times))
+                `(progn
+                   (format t "~&------- v2 -------~%")
+                   (dotimes (_ ,times)
+                     (format t "~A~%" (my-sum :from ,from :to ,to))))
+                form)))
+      (format t "~&Compiled Finish (v2 ~A ~A ~A) : ~S~%" from to times result)
+      result))
+
+  (defun v2 (from to &optional (times 5))
+    (format t "~&------- v2 -------~%")
+    (dotimes (_ times)
+      (format t "~A~%" (my-sum :from from :to to))))
+
+  (flet ((tv1 () (v1 0 2000000000)))
+    (format t "------- progn tv1 ---------")
+    (time (tv1))
+    (time (tv1)))
+
+  (flet ((tv2 () (v2 0 2000000000)))
+    (format t "------- progn tv2 ---------")
+    (time (tv2))
+    (time (tv2)))
+
+  (defun tv1 () (v1 0 2000000000))
+  (defun tv2 () (v2 0 2000000000))
+
+  (time (tv1))
+  (time (tv2))
+  (time (tv2))
+
+  (defun f ()
+    (format t "------- function f ---------")
+    (time (v2 0 1000000000))
+    (time (v2 0 1000000000)))
+  (f)
+
+  (defmacro m (from to)
+    (let ((f-sym (gensym)))
+      `(flet ((,f-sym () (v2 ,from ,to)))
+         (format t "------- macro f ---------")
+         (time (,f-sym))
+         (time (,f-sym)))))
+  (m 0 1000000000)
+
+
+  (define-compiler-macro bf (&whole form from to)
+    (if (and (realp from)
+             (realp to))
+        (let ((result `(progn
+                         (format t "------- function bf ---------")
+                         (time (v2 ,from ,to))
+                         (time (v2 ,from ,to)))))
+          (format t "Compile bf: ~S" result)
+          result)
+        form))
+
+  (define-compiler-macro bf (&whole form from to)
+    (format t "~&Compile (bf ~A ~A)~%" from to)
+    (let ((result
+            (if (and (realp from)
+                     (realp to))
+                `(progn
+                   (format t "------- function bf ---------")
+                   (time (v2 ,from ,to))
+                   (time (v2 ,from ,to)))
+                form)))
+      (format t "~&Compiled Finish (bf ~A ~A) : ~S~%" from to result)
+      result))
+
+  (defun bf (from to)
+    (format t "------- function bf ---------")
+    (time (v2 from to))
+    (time (v2 from to)))
+
+  (funcall #'bf 0 1000000000)
+  (flet ((_f () (bf 0 1000000000)))
+    (_f))
+#+end_src
+
