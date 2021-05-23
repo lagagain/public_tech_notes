@@ -87,4 +87,13 @@ MKCL 和 WCL 我不清楚是不是有達到 ANSI 標準拉 (o (*≧▽≦)ツ)�
   #m ("小明" . (跑步))
 #+END_SRC
 
-* TODO C巨集與Lisp Macro
+* TODO C 巨集與 Lisp Macro
+
+
+
+  
+* Other
+
+  - [[https://gist.github.com/lagagain/148cb82918427b44236f31fc956497b1][超凡脫俗的極限 - Common Lisp]]
+  - [[https://gist.github.com/lagagain/6af8ae7590ac8ce89eb71a4824c04526][为什么Lisp语言如此先进？（译文）]]
+  - [[https://gist.github.com/lagagain/3c20c139755020e26cde6127c3886caf][Lisp 是怎么成为上帝的编程语言的？]]
