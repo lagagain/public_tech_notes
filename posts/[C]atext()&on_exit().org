@@ -5,7 +5,7 @@
 #+export_file_name: ../docs/[C]atext()&on_exit()
 * 在退出之前
 
-可以透過 =on_exit()= 或 =atexit()= 註冊hook。
+可以透過 =on_exit()= 或 =atexit()= 註冊 hook。
 ** COMMENT 範例
 
 #+begin_src c
@@ -33,8 +33,94 @@
     printf("\nWant see you again.~\n");
   }
 #+end_src
+* 實際上 main 也並非真正的進入點
 
+  #+begin_src c :tangle my_main.c
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    int main(void) {
+      printf("Hello, World\n");
+    }
+
+    void my_entry(void) {
+      printf("My Entry\n");
+      exit(main());
+    }
+
+  #+end_src
+
+  可以在編譯的時候指定進入點 =my_main=
+
+  #+begin_src shell :results none
+    gcc -o main my_main.c -Wl,-emy_entry
+  #+end_src
+
+  或是
+
+  #+begin_src shell :results none
+    gcc -o main my_main.c -e my_entry
+  #+end_src
+
+  執行
+  #+begin_src shell :results output string   
+    ./main
+  #+end_src
+
+  #+RESULTS:
+  : My Entry
+  : Hello, World
+
+  可以透過 =--verbose= 了解詳細過程
+
+  #+begin_src shell :results output string
+    gcc -o main my_main.c -e my_entry --verbose -Wl,--verbose
+  #+end_src
+  
+* 手動連接時也可以看得出進入點並非 main
+
+  #+begin_src shell :results none
+    gcc -c my_main.c -o main.o
+    ld -o main -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crt1.o -L /usr/lib/gcc/x86_64-linux-gnu/9 -lc -lgcc -lgcc_s main.o /usr/lib/x86_64-linux-gnu/crtn.o
+  #+end_src
+
+  =ld-linux-x86-64.so.2= 是用 =-dynamic-linker= 指定的動態連接器， =crti.o= 、 =crt1.o= 、 =crtn.o= 是 C 的執行環境(Run Time)。同時也是提供真正進入點的地方。此外還需要綁定標準函式庫 =libc= 、 =libgcc= 、 =libgcc_s= 。
+
+  #+begin_quote https://developer.aliyun.com/article/440759
+  
+
+crt1.o, crti.o, crtbegin.o, crtend.o, crtn.o 等目标文件和 daemon.o（由我们自己的 C 程序文件产生）链接成一个执行文件。前面这 5 个目标文件的作用分别是启动、初始化、构造、析构和结束，它们 通常会被自动链接到应用程序中。例如，应用程序的 main()函数就是通过这些文件来调用的。如果不进行标准的链接的话（编译选项-nostdlib）， 我们就必须指明这些必要的目标文件，如果未指定，链接器就会提示找不到_start 符号，并因此导致链接失败。且，将目标文件提供给编译器的次序也很重 要，因为 GNU 链接器（编译器会自动调用该链接器进行目标文件的链接）只是个单次处理链接器。
+
+
+Glibc 有几个辅助程序运行的运行库 (C RunTime Library)，分别是/usr/lib/crt1.o、/usr/lib/crti.o 和/usr/lib/crtn.o，其中 crt1.o 中包含程 序的入口函数_start 以及两个未定义的符号__libc_start_main 和 main，由_start 负责调用 __libc_start_main 初始化 libc，然后调用我们源代码中定义的 main 函数；另外，由于类似于全局静态对象这样的代码需要在 main 函 数之前执行，crti.o 和 crtn.o 负责辅助启动这些代码。另外，Gcc 中同样也有 crtbegin.o 和 crtend.o 两个文件，这两个目标文件 用于配合 glibc 来实现 C++的全局构造和析构。
+
+
+android bionic,这个 C runtime library 设计并不是功能特别强大,并且有些 gnu glic 中的函数没有实现,这是移植时会碰到的问题.而且,这个 C runtime library 也并没有采用 crt0.o,crt1.o,crti.o crtn.o,crtbegin.o crtend.o,而是采用了 android 自己的 crtbegin_dynamic.o, crtbegin_static.o 和 crtend_android.o。crt1.o 是 crt0.o 的后续演进版本,crt1.o 中会非常重要的.init 段和.fini 段以及_start 函数的入口..init 段和.fini 段实际上是靠 crti.o 以及 crtn.o 来实现的. init 段是 main 函数之前的初始化工作代码, 比如全局变量的构造. fini 段则负责 main 函数之后的清理工作.crti.o crtn.o 是负责 C 的初始化,而 C++则必须依赖 crtbegin.o 和 crtend.o 来帮助实现.
+        So,在标准的 linux 平台下,link 的顺序是:ld crt1.o crti.o [user_objects] [system_libraries] crtn.o
+        而在 android 下,link 的顺序是:arm-eabi-g++ crtbegin_dynamic.o [user_objects] [system_libraries]crtend_android.o
+        所以这就是从另一个方面说明为什么不适合 codesourcery 之类编译来开发 android 底层东西的原因了,这里不包括 BSP 之类.
+
+
+main()也是一个函数。
+
+这 是因为在编译连接时它将会作为 crt0.s 汇编程序的函数被调用。crt0.s 是一个桩（stub）程序，名称中的“crt”是“C run-time”的缩写。该程序的目标文件将被链接在每个用户执行程序的开始部分，主要用于设置一些初始化全局变量。通常使用 gcc 编译链接生成文件 时，gcc 会自动把该文件的代码作为第一个模块链接在可执行程序中。在编译时使用显示详细信息选项“-v”就可以明显地看出这个链接操作过程。因此在通常 的编译过程中，我们无需特别指定 stub 模块 crt0.o。为了使用 ELF 格式的目标文件以及建立共享库模块文件，现在的编译器已经把 crt0 扩展成几个 模块：crt1.0、crti.o、crtbegin.o、crtend.o 和 crtn.o。 这些模块的链接顺序为 crt1.o、crti.o、crtbegin.o（crtbeginS.o）、所有程序模块、 crtend.o（crtendS.o）、crtn.o、库模块文件。gcc 的配置文件 specfile 指定了这种链接顺序。其中，crt1.o、 crti.o 和 crtn.o 由 C 库提供，是 C 程序的“启动”模块；crtbegin.o 和 crtend.o 是 C++语言的启动模块，由编译器 gcc 提供； 而 crt1.o 则与 crt0.o 的作用类似，主要用于在调用 main()之前做一些初始化工作，全局符号_start 就定义在这个模块中。 crtbegin.o 和 crtend.o 主要用于 C++语言，在.ctors 和.dtors 区中执行全局构造（constructor）和析构 （destructor）函数。crtbeginS.o 和 crtendS.o 的作用与前两者类似，但用于创建共享模块中。crti.o 用于在.init 区 中执行初始化函数 init()。.init 区中包含进程的初始化代码，即当程序开始执行时，系统会在调用 main()之前先执行.init 中的代码。 crtn.o 则用于在.fini 区中执行进程终止退出处理函数 fini()函数，即当程序正常退出时（main()返回之后），系统会安排执行.fini 中的代码。
+
+  #+end_quote
+
+
+[[https://i.ibb.co/QHjZcmf/image.png]]
+
+
+[[https://i.ibb.co/nB1mcH0/image.png]]
+  
 * 參考資料
 
 - [[https://gist.github.com/lagagain/b807bffca4858a38e44d20d71d1f9f3f][Gist]]
--[[https://www.gnu.org/software/libc/manual/html_node/Cleanups-on-Exit.html][Cleanups on Exit]]
+- [[https://www.gnu.org/software/libc/manual/html_node/Cleanups-on-Exit.html][Cleanups on Exit]]
+- [[https://developer.aliyun.com/article/440759][Glibc辅助运行库 (C RunTime Library): crt0.o,crt1.o,crti.o crtn.o,crtbegin.o crtend.o]]
+- [[https://www.codenong.com/6656317/][关于gcc：使用__libc_csu_fini 的未定义引用直接将C程序与ld链接失败]]
+- [[https://zh.wikipedia.org/wiki/Crt0][crt0 維基百科]]
+- [[https://stackoverflow.com/questions/7494244/how-to-change-entry-point-of-c-program-with-gcc#7494273][How to change entry point of C program with gcc?]]
+- https://wizardforcel.gitbooks.io/100-gcc-tips/content/set-dynamic-linker.html
+- [[https://blog.csdn.net/cheung1987/article/details/8223406?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.control][gcc as和ld的学习笔记]]
+   
