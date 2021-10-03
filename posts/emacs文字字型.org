@@ -1,0 +1,10 @@
+
+
+
+[[http://ergoemacs.org/emacs/elisp_text_properties.html][Elisp: Text Properties]]
+
+[[https://ftp.gnu.org/old-gnu/emacs/windows/docs/faq4.html][How do I change the size, position, font, and color attributes of Emacs?]]
+
+[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Replacing-Specs.html][39.16.1 Display Specs That Replace The Text]]
+
+[[http://ergoemacs.org/emacs/emacs_proportional_font.html][Emacs: Proportional Font]]
