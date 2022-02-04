@@ -1,0 +1,139 @@
+
+
+#+begin_src makefile :tangle Makefile
+run: cmain
+  LD_LIBRARY_PATH=/usr/local/lib/:. cmain
+
+clean:
+	rm add.o libadd.so main.o cmain hello-add
+
+add.o: add.lisp compile.lisp
+	ecl --shell compile.lisp
+
+libadd.so: add.o
+
+cmain: cmain.c libadd.so
+	gcc cmain.c libadd.so -lecl -o cmain
+
+main.o: main.lisp
+	ecl --shell compile.lisp
+
+hello-add: main.o
+	ecl --shell compile.lisp
+#+end_src
+
+
+
+#+begin_src lisp :tangle add.lisp
+
+(declaim (ftype (function (fixnum fixnum) fixnum) add))
+(defun add (a b)
+  (declare (type fixnum a b))
+  (the fixnum (+ a b))
+  (+ a b))
+
+
+(defun hello ()
+  (format t "Hello World~%"))
+
+
+(defstruct person
+  (name "" :type string)
+  (age 0 :type integer))
+
+;; (make-person :name "Bob" :age 25)
+
+#+end_src
+
+
+
+#+begin_src c :tangle cmain.c
+#include <ecl/ecl.h>
+#include <ecl/external.h>
+
+extern void init_add_package (cl_object cblock);
+
+int main(int argc, char *argv[])
+{
+  /* setup the lisp runtime */
+  cl_boot(argc, argv);
+
+  /* call the init function via read_VV */
+  read_VV(OBJNULL, init_add_package);
+
+  const char *format = "(format t \"Hello ~A~%\" (add 5 6))";
+  cl_eval(c_string_to_object(format));
+
+  cl_object cl_add = ecl_make_symbol("+", "CL-USER");
+  cl_object result = cl_funcall(3, cl_add, MAKE_FIXNUM(5), MAKE_FIXNUM(10));
+  cl_fixnum r = fixnnint(result);
+  printf("%ld\n", r);
+
+  result = cl_eval(c_string_to_object("(+ 1 10)"));
+  printf("%ld\n", r);
+
+  cl_add = ecl_make_symbol("ADD", "CL-USER");
+  result = cl_funcall(3, cl_add, MAKE_FIXNUM(10), MAKE_FIXNUM(90));
+  //r = fixnnint(result);
+  r = ecl_to_fixnum(result);
+  printf("%ld\n", r);
+
+  cl_object cl_hello = ecl_make_symbol("HELLO", "CL-USER");
+  cl_funcall(1, cl_hello);
+
+
+  cl_object cl_make_person = ecl_make_symbol("MAKE-PERSON", "CL-USER");
+  cl_object person =
+      cl_funcall(5, cl_make_person, ecl_make_symbol("NAME", "KEYWORD"),
+                 c_string_to_object("\"Bob\""), ecl_make_symbol("AGE", "KEYWORD"),
+                 ecl_make_unsigned_integer(30));
+  printf("struct length: %lu\n", ECL_STRUCT_LENGTH(person));
+  printf("person' name: %ls\n", ECL_STRUCT_SLOT(person, 0)->string.self);
+  printf("person' age: %lld\n", ecl_to_long_long(ECL_STRUCT_SLOT(person, 1)));
+
+  /* shutdown the lisp runtime */
+  cl_shutdown();
+  return 0;
+}
+
+#+end_src
+
+
+
+#+begin_src lisp :tangle compile.lisp
+  
+(ext:install-bytecodes-compiler)
+(ext:install-c-compiler)
+
+;; generates add.o
+(compile-file "add.lisp" :system-p t)
+
+
+;; generates libadd.so
+(c:build-shared-library "add"
+                        :lisp-files '("add.o")
+                        :init-name "init_add_package")
+
+
+
+(compile-file "main.lisp" :system-p t)
+(c:build-program "hello-add"
+                 :lisp-files '("main.o"))
+
+#+end_src
+
+
+
+#+begin_src lisp :tangle main.lisp
+(load "add.lisp")
+
+
+(defun main ()
+  (format t "Run main: (add 5 10) => ~A~%" (add 5 10)))
+
+
+(main)
+
+
+(quit)
+#+end_src
