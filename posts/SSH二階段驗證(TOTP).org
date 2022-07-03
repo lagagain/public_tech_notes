@@ -67,4 +67,5 @@
   
 * Refrences
   - [[https://www.netadmin.com.tw/netadmin/zh-tw/technology/C5A1A0B2C3864A83B32D48AA93C2A764][Google動態密碼再強化　搭配PAM靈活配置雙認證]]
+  - [[https://blog.longwin.com.tw/2014/10/ssh-google-2-factor-authentication-2014/][Linux SSH 加上 Google 兩階段認證服務檢核]] 
 
