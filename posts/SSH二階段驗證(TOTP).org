@@ -1,0 +1,70 @@
+
+
+
+
+* 安裝設定 libpam-google-authenticator
+
+  #+begin_src shell
+    apt-get install libpam-google-authenticator
+  #+end_src
+
+
+  然後輸入 ~google-authenticator~ 執行。會看到一個 QR Code。透過管理 TOTP 的工具掃描。然後輸入驗證碼。
+
+  最後保存到 ~$HOME/.google_authenticator~ 。
+
+  接者會在詢問是否一些安全性問題。像是是否重複使用 code，禁止的話，就只能當 code 更新後才可以再登入。（一般更新時間為 30 秒）
+
+  
+  
+  
+* 設定 pam 登入
+
+  編輯 ~/etc/pam.d/sshd~
+
+
+  添加以下在最後
+  #+begin_quote
+  # Auth by Google-Authenticator
+  auth required pam_google_authenticator.so
+  # auth substack password-auth
+  #+end_quote
+
+  
+** 允許只使用 TOPT 登入
+   **注意！：這部份只徵對對於 TOPT 等驗證方式有所了解的人**
+
+   將 Google Authenticator 驗證方式改為開頭，並將 ~@include common-auth~ 部份註解掉
+
+   #+begin_quote
+   # Auth by Google-Authenticator
+   auth sufficient pam_google_authenticator.so
+   # auth substack password-auth
+   # Standard Un*x authentication.
+   #@include common-auth
+   #+end_quote
+
+
+   
+* 調整 SSH Server 設定
+
+  編輯 ~/etc/ssh/sshd_config~ ， 將 ~ChallengeResponseAuthentication~ 設置為 ~yes~ 。
+
+  最後重新啟動服務：
+
+  #+begin_src shell
+    sudo service ssh restart
+  #+end_src
+
+
+  
+* 其他
+
+  另外我會建議在安裝 `sshguard` 做保護，並調整 SSH Server 提供服務的 port。
+  #+begin_src shell
+    apt-get install sshguard
+  #+end_src
+  
+* Refrences
+  - [[https://www.netadmin.com.tw/netadmin/zh-tw/technology/C5A1A0B2C3864A83B32D48AA93C2A764][Google動態密碼再強化　搭配PAM靈活配置雙認證]]
+
